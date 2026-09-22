@@ -8,14 +8,54 @@ Streamlit, OpenCV, NumPy, and PyTorch LRASPP MobileNet.
 
 import time
 import os
+import threading
 import cv2
 import numpy as np
 import streamlit as st
 from PIL import Image
 
+try:
+    import av
+    from streamlit_webrtc import webrtc_streamer, RTCConfiguration, VideoProcessorBase
+    HAS_WEBRTC = True
+except ImportError:
+    HAS_WEBRTC = False
+
 import filters
 import background
 import utils
+
+# --- Thread-Safe Holder for Live WebRTC Processing ---
+class LiveFilterHolder:
+    _lock = threading.Lock()
+    _filter_name = "Original"
+    _params = {}
+
+    @classmethod
+    def set(cls, filter_name, params):
+        with cls._lock:
+            cls._filter_name = filter_name
+            cls._params = params
+
+    @classmethod
+    def get(cls):
+        with cls._lock:
+            return cls._filter_name, cls._params
+
+# STUN servers for NAT/firewall traversal on Streamlit Cloud
+RTC_CONFIGURATION = (
+    RTCConfiguration(
+        {
+            "iceServers": [
+                {"urls": ["stun:stun.l.google.com:19302"]},
+                {"urls": ["stun:stun1.l.google.com:19302"]},
+                {"urls": ["stun:stun2.l.google.com:19302"]},
+            ]
+        }
+    )
+    if HAS_WEBRTC
+    else None
+)
 
 # --- Page Configuration ---
 st.set_page_config(
@@ -131,7 +171,13 @@ def render_sidebar():
         st.markdown("#### 1. Input Source")
         input_source = st.radio(
             "Select Media Input:",
-            ["Upload Image", "Camera Snapshot", "Live Webcam Stream", "Preset Samples"],
+            [
+                "Live Camera (WebRTC Stream)",
+                "Camera Snapshot",
+                "Upload Image",
+                "Preset Samples",
+                "Local Desktop Camera (OpenCV)",
+            ],
             index=0,
             label_visibility="collapsed",
         )
@@ -268,6 +314,9 @@ def render_sidebar():
             ["Side-by-Side (Original vs Processed)", "Processed Only", "Before / After Split"],
             index=0,
         )
+
+    # Synchronize state for live WebRTC background thread
+    LiveFilterHolder.set(selected_filter, params)
 
     return {
         "input_source": input_source,
@@ -410,12 +459,34 @@ def process_image(image_rgb: np.ndarray, filter_name: str, params: dict):
     return processed, duration_ms, fps
 
 
+def webrtc_video_frame_callback(frame: "av.VideoFrame") -> "av.VideoFrame":
+    """Processes each frame received from the browser's webcam via WebRTC in real time."""
+    img_bgr = frame.to_ndarray(format="bgr24")
+    img_rgb = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
+
+    cur_filter, cur_params = LiveFilterHolder.get()
+    try:
+        processed, _, _ = process_image(img_rgb, cur_filter, cur_params)
+        if processed.ndim == 3 and processed.shape[2] == 4:
+            alpha = processed[:, :, 3:4] / 255.0
+            fg = processed[:, :, :3]
+            bg = np.full_like(fg, 30)
+            comp = (fg * alpha + bg * (1.0 - alpha)).astype(np.uint8)
+            out_bgr = cv2.cvtColor(comp, cv2.COLOR_RGB2BGR)
+        else:
+            out_bgr = cv2.cvtColor(processed, cv2.COLOR_RGB2BGR)
+    except Exception:
+        out_bgr = img_bgr
+
+    return av.VideoFrame.from_ndarray(out_bgr, format="bgr24")
+
+
 def run_live_webcam_feed(selected_filter: str, params: dict, max_dim: int):
     """
     Executes a high-speed live webcam stream using OpenCV VideoCapture.
     Renders frames directly to an empty Streamlit placeholder with live FPS display.
     """
-    st.info("💡 **Live Camera Mode Active.** Click **'Stop Webcam Feed'** below when finished.")
+    st.info("💡 **Local Desktop OpenCV Mode Active.** Click **'Stop Webcam Feed'** below when finished.")
 
     col1, col2 = st.columns([3, 1])
     with col1:
@@ -428,7 +499,11 @@ def run_live_webcam_feed(selected_filter: str, params: dict, max_dim: int):
 
     cap = cv2.VideoCapture(int(cam_id))
     if not cap.isOpened():
-        st.error(f"❌ Could not open camera device index {cam_id}. Please ensure camera is connected and not in use by another application.")
+        st.error(
+            f"❌ Camera device index {cam_id} could not be opened by the server.\n\n"
+            "👉 **On Streamlit Cloud**, cloud virtual machines have no physical webcam attached. "
+            "Please switch to **'Live Camera (WebRTC Stream)'** in the sidebar to stream directly from your personal browser webcam!"
+        )
         return
 
     # Optimize capture resolution for high responsiveness
@@ -501,8 +576,42 @@ def main():
     max_dim = config["max_dimension"]
     comp_view = config["comparison_view"]
 
-    # 1. Handle Live Webcam Stream Mode
-    if input_source == "Live Webcam Stream":
+    # 1. Handle Live WebRTC Browser Stream Mode
+    if input_source == "Live Camera (WebRTC Stream)":
+        st.markdown(f"### 📹 Real-Time Live Browser Camera ({selected_filter})")
+        st.info(
+            "💡 Click **'START'** below. Your browser will prompt to allow camera access. "
+            "Your live video feed will stream and process in real time as you adjust filter parameters in the sidebar!"
+        )
+        if HAS_WEBRTC:
+            webrtc_streamer(
+                key="cv-studio-live-stream",
+                video_frame_callback=webrtc_video_frame_callback,
+                rtc_configuration=RTC_CONFIGURATION,
+                media_stream_constraints={"video": {"width": {"ideal": 640}, "height": {"ideal": 480}}, "audio": False},
+                async_processing=True,
+            )
+            st.markdown(
+                f"""
+                <div style="display: flex; gap: 15px; margin-top: 15px;">
+                    <div class="metric-card" style="flex: 1;">
+                        <div class="metric-val">{selected_filter}</div>
+                        <div class="metric-lbl">Active Live Filter</div>
+                    </div>
+                    <div class="metric-card" style="flex: 2;">
+                        <div class="metric-val">WebRTC Stream</div>
+                        <div class="metric-lbl">Mode (Browser Client)</div>
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+        else:
+            st.warning("⚠️ WebRTC module is loading. Please refresh the page or use 'Camera Snapshot' above.")
+        return
+
+    # 2. Handle Local Desktop OpenCV Camera Feed
+    if input_source == "Local Desktop Camera (OpenCV)":
         run_live_webcam_feed(selected_filter, params, max_dim)
         return
 
