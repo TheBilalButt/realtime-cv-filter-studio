@@ -811,6 +811,48 @@ def main():
             else:
                 st.error("WebRTC streaming module is not available in the current environment.")
 
+            # Live Camera Snapshot & OCR Section
+            st.markdown("<div style='height: 8px;'></div>", unsafe_allow_html=True)
+            with st.expander("CamScanner OCR: Snap and Extract Text from Live Camera", expanded=False):
+                st.caption("Hold your document or notebook up to the webcam, capture a frame, and extract digital text.")
+                cam_snap = st.camera_input("Take Camera Snapshot for OCR Text Extraction", key="live_cam_ocr_snap")
+                if cam_snap is not None:
+                    snap_img = utils.load_image(cam_snap)
+                    col_s1, col_s2 = st.columns(2)
+                    with col_s1:
+                        st.image(snap_img, caption="Captured Frame", use_container_width=True)
+                    with col_s2:
+                        if st.button("Extract Text from Snapshot", key="btn_extract_live_snap", use_container_width=True):
+                            with st.spinner("Processing document text..."):
+                                snap_ocr = ocr.extract_document_text(snap_img)
+                                st.session_state["live_snap_ocr"] = snap_ocr
+                                st.session_state["live_ocr_version"] = st.session_state.get("live_ocr_version", 0) + 1
+
+                        if "live_snap_ocr" in st.session_state:
+                            s_ocr = st.session_state["live_snap_ocr"]
+                            st.markdown(
+                                f"""
+                                <div style="display: flex; gap: 6px; align-items: center; margin: 6px 0;">
+                                    <span class="panel-status">Engine: {s_ocr.get('engine', 'OCR')}</span>
+                                    <span class="panel-status" style="background: rgba(16, 185, 129, 0.12); color: #34d399; border-color: rgba(16, 185, 129, 0.25);">{s_ocr.get('word_count', 0)} Words</span>
+                                </div>
+                                """,
+                                unsafe_allow_html=True,
+                            )
+                            s_text = st.text_area(
+                                "Extracted Digital Text:",
+                                value=s_ocr.get("text", ""),
+                                height=120,
+                                key=f"live_snap_text_{st.session_state.get('live_ocr_version', 0)}",
+                            )
+                            st.download_button(
+                                "Download Text (.txt)",
+                                data=s_text.encode("utf-8"),
+                                file_name="webcam_document_text.txt",
+                                mime="text/plain",
+                                use_container_width=True,
+                            )
+
     # =========================================================================
     # VIEW B: PHOTO STUDIO (Original Image | Processed Image Side-by-Side)
     # =========================================================================
@@ -933,7 +975,9 @@ def main():
             if do_extract or "last_ocr_result" in st.session_state:
                 if do_extract:
                     with st.spinner("Analyzing document and extracting text..."):
-                        st.session_state["last_ocr_result"] = ocr.extract_document_text(processed_result)
+                        ocr_res = ocr.extract_document_text(processed_result)
+                        st.session_state["last_ocr_result"] = ocr_res
+                        st.session_state["ocr_version"] = st.session_state.get("ocr_version", 0) + 1
 
                 ocr_res = st.session_state.get("last_ocr_result", {})
                 if ocr_res and ocr_res.get("success"):
@@ -953,7 +997,7 @@ def main():
                         value=ocr_res.get("text", ""),
                         height=160,
                         help="You can correct any recognized characters, fix handwritten letters like 'C', or format notes.",
-                        key="doc_ocr_text_area",
+                        key=f"doc_ocr_text_area_{st.session_state.get('ocr_version', 0)}",
                     )
 
                     t_down_col1, t_down_col2 = st.columns(2)
