@@ -84,8 +84,8 @@ st.markdown(
 
     /* Container Spacing */
     .block-container {
-        padding-top: 1rem !important;
-        padding-bottom: 2rem !important;
+        padding-top: 0.6rem !important;
+        padding-bottom: 1.2rem !important;
         max-width: 1360px !important;
     }
 
@@ -95,39 +95,39 @@ st.markdown(
         justify-content: space-between;
         align-items: center;
         border-bottom: 1px solid #1e293b;
-        padding-bottom: 0.6rem;
-        margin-bottom: 0.8rem;
+        padding-bottom: 0.4rem;
+        margin-bottom: 0.5rem;
         flex-wrap: wrap;
         gap: 10px;
     }
     .studio-title {
         font-family: 'Space Grotesk', sans-serif !important;
-        font-size: 1.65rem;
+        font-size: 1.5rem;
         font-weight: 700;
         letter-spacing: -0.02em;
         color: #f8fafc;
         margin: 0;
     }
     .studio-subtitle {
-        font-size: 0.82rem;
+        font-size: 0.78rem;
         color: #94a3b8;
         margin-top: 1px;
     }
     .author-badge {
-        font-size: 0.76rem;
+        font-size: 0.74rem;
         font-weight: 700;
         letter-spacing: 0.05em;
         text-transform: uppercase;
         color: #38bdf8;
         background: rgba(56, 189, 248, 0.08);
         border: 1px solid rgba(56, 189, 248, 0.3);
-        padding: 4px 12px;
+        padding: 3px 10px;
         border-radius: 6px;
     }
 
     /* Compact Responsive Camera Frame */
     div[data-testid="stWebRtcStreamer"] {
-        max-width: 680px !important;
+        max-width: 440px !important;
         margin: 0 auto !important;
         border-radius: 8px !important;
         overflow: hidden !important;
@@ -135,7 +135,7 @@ st.markdown(
         border: 1px solid #1f2937 !important;
     }
     div[data-testid="stWebRtcStreamer"] video {
-        max-height: 380px !important;
+        max-height: 220px !important;
         width: 100% !important;
         object-fit: contain !important;
     }
@@ -719,38 +719,40 @@ def main():
     # VIEW A: LIVE CAMERA STREAM VIEW (Compact, Centered, 50/50 Split)
     # =========================================================================
     if is_live:
-        cam_bar1, cam_bar2 = st.columns([2, 1])
-        with cam_bar1:
-            st.markdown(
-                f"""
-                <div class="panel-header" style="border-radius: 6px 6px 0 0;">
-                    <span class="panel-label">Live Camera Viewport (50/50 Split Enabled)</span>
-                    <span class="panel-status">Active Filter: {active_filter}</span>
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
-        with cam_bar2:
-            split_toggle = st.checkbox(
-                "50/50 Split (Original Left | Filter Right)",
-                value=st.session_state["live_split_view"],
-            )
-            if split_toggle != st.session_state["live_split_view"]:
-                st.session_state["live_split_view"] = split_toggle
-                LiveFilterHolder.set(active_filter, params, split_view=split_toggle)
-                st.rerun()
+        _, cam_center, _ = st.columns([1, 1.8, 1])
+        with cam_center:
+            cam_bar1, cam_bar2 = st.columns([1.8, 1.2])
+            with cam_bar1:
+                st.markdown(
+                    f"""
+                    <div class="panel-header" style="border-radius: 6px 6px 0 0; padding: 4px 8px;">
+                        <span class="panel-label" style="font-size: 0.72rem;">Live Camera</span>
+                        <span class="panel-status" style="font-size: 0.68rem;">Active: {active_filter}</span>
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
+                )
+            with cam_bar2:
+                split_toggle = st.checkbox(
+                    "50/50 Split",
+                    value=st.session_state["live_split_view"],
+                )
+                if split_toggle != st.session_state["live_split_view"]:
+                    st.session_state["live_split_view"] = split_toggle
+                    LiveFilterHolder.set(active_filter, params, split_view=split_toggle)
+                    st.rerun()
 
-        if HAS_WEBRTC:
-            webrtc_streamer(
-                key="studio-live-stream-streamer",
-                video_frame_callback=webrtc_video_frame_callback,
-                rtc_configuration=RTC_CONFIGURATION,
-                media_stream_constraints={"video": {"width": {"ideal": 640}, "height": {"ideal": 480}}, "audio": False},
-                async_processing=True,
-            )
-            st.caption("Click START above. The left half displays your original camera feed; the right half displays the filter in real time. Click any filter button above to switch instantly!")
-        else:
-            st.error("WebRTC streaming module is not available in the current environment.")
+            if HAS_WEBRTC:
+                webrtc_streamer(
+                    key="studio-live-stream-streamer",
+                    video_frame_callback=webrtc_video_frame_callback,
+                    rtc_configuration=RTC_CONFIGURATION,
+                    media_stream_constraints={"video": {"width": {"ideal": 480}, "height": {"ideal": 360}}, "audio": False},
+                    async_processing=True,
+                )
+                st.caption("Left: Original | Right: Filtered. Click START above to begin streaming.")
+            else:
+                st.error("WebRTC streaming module is not available in the current environment.")
 
     # =========================================================================
     # VIEW B: PHOTO STUDIO (Original Image | Processed Image Side-by-Side)
