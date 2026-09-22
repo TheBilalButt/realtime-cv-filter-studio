@@ -75,18 +75,18 @@ st.markdown(
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
 
     <style>
-    /* Global Reset & Typography */
+    /* Global Reset & Modern Dark Canvas */
     html, body, [class*="css"] {
         font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif !important;
-        background-color: #0b0f19 !important;
+        background-color: #090d16 !important;
         color: #f1f5f9 !important;
     }
 
     /* Container Spacing */
     .block-container {
-        padding-top: 0.6rem !important;
+        padding-top: 0.5rem !important;
         padding-bottom: 1.2rem !important;
-        max-width: 1360px !important;
+        max-width: 1380px !important;
     }
 
     /* Header Styling */
@@ -94,35 +94,35 @@ st.markdown(
         display: flex;
         justify-content: space-between;
         align-items: center;
-        border-bottom: 1px solid #1e293b;
-        padding-bottom: 0.4rem;
-        margin-bottom: 0.5rem;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+        padding-bottom: 0.45rem;
+        margin-bottom: 0.6rem;
         flex-wrap: wrap;
         gap: 10px;
     }
     .studio-title {
         font-family: 'Space Grotesk', sans-serif !important;
-        font-size: 1.5rem;
+        font-size: 1.55rem;
         font-weight: 700;
-        letter-spacing: -0.02em;
+        letter-spacing: -0.025em;
         color: #f8fafc;
         margin: 0;
     }
     .studio-subtitle {
-        font-size: 0.78rem;
+        font-size: 0.8rem;
         color: #94a3b8;
-        margin-top: 1px;
+        margin-top: 2px;
     }
     .author-badge {
-        font-size: 0.74rem;
+        font-size: 0.72rem;
         font-weight: 700;
-        letter-spacing: 0.05em;
+        letter-spacing: 0.06em;
         text-transform: uppercase;
-        color: #38bdf8;
-        background: rgba(56, 189, 248, 0.08);
-        border: 1px solid rgba(56, 189, 248, 0.3);
-        padding: 3px 10px;
-        border-radius: 6px;
+        color: #60a5fa;
+        background: rgba(37, 99, 235, 0.1);
+        border: 1px solid rgba(96, 165, 250, 0.3);
+        padding: 4px 12px;
+        border-radius: 9999px;
     }
 
     /* Compact Responsive Camera Frame */
@@ -131,8 +131,9 @@ st.markdown(
         margin: 0 auto !important;
         border-radius: 8px !important;
         overflow: hidden !important;
-        background: #030712 !important;
-        border: 1px solid #1f2937 !important;
+        background: #040711 !important;
+        border: 1px solid rgba(148, 163, 184, 0.16) !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
     }
     div[data-testid="stWebRtcStreamer"] video {
         max-height: 220px !important;
@@ -146,7 +147,7 @@ st.markdown(
         justify-content: space-between;
         align-items: center;
         background: #111827;
-        border: 1px solid #1f2937;
+        border: 1px solid rgba(148, 163, 184, 0.14);
         border-bottom: none;
         border-radius: 8px 8px 0 0;
         padding: 6px 12px;
@@ -155,25 +156,46 @@ st.markdown(
         font-size: 0.75rem;
         font-weight: 700;
         text-transform: uppercase;
-        letter-spacing: 0.08em;
+        letter-spacing: 0.06em;
         color: #94a3b8;
     }
     .panel-status {
-        font-size: 0.7rem;
-        font-weight: 600;
+        font-size: 0.68rem;
+        font-weight: 700;
         color: #38bdf8;
         background: rgba(56, 189, 248, 0.12);
+        border: 1px solid rgba(56, 189, 248, 0.25);
+        padding: 2px 8px;
+        border-radius: 4px;
+    }
+    .panel-status-live {
+        font-size: 0.68rem;
+        font-weight: 700;
+        color: #34d399;
+        background: rgba(16, 185, 129, 0.12);
+        border: 1px solid rgba(16, 185, 129, 0.25);
         padding: 2px 8px;
         border-radius: 4px;
     }
 
     /* Image Wrapper */
     .image-frame {
-        border: 1px solid #1f2937;
+        border: 1px solid rgba(148, 163, 184, 0.14);
         border-radius: 0 0 8px 8px;
-        background: #030712;
+        background: #040711;
         overflow: hidden;
         margin-bottom: 0.5rem;
+    }
+
+    /* Thumbnail Previews */
+    div[data-testid="stImage"] img {
+        border-radius: 6px !important;
+        border: 1px solid rgba(148, 163, 184, 0.12) !important;
+        transition: transform 0.16s ease, border-color 0.16s ease !important;
+    }
+    div[data-testid="stImage"]:hover img {
+        border-color: rgba(96, 165, 250, 0.6) !important;
+        transform: scale(1.02) !important;
     }
 
     /* Performance Metric Cards */
@@ -186,10 +208,11 @@ st.markdown(
     }
     .metric-box {
         background: #111827;
-        border: 1px solid #1f2937;
-        border-radius: 6px;
+        border: 1px solid rgba(148, 163, 184, 0.12);
+        border-radius: 7px;
         padding: 6px 8px;
         text-align: center;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
     }
     .metric-number {
         font-family: 'Space Grotesk', monospace;
@@ -198,7 +221,7 @@ st.markdown(
         color: #f8fafc;
     }
     .metric-title {
-        font-size: 0.68rem;
+        font-size: 0.66rem;
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.05em;
@@ -206,38 +229,57 @@ st.markdown(
         margin-top: 1px;
     }
 
-    /* Action Buttons */
-    div.stButton > button {
-        border-radius: 6px !important;
+    /* Secondary Buttons */
+    div.stButton > button,
+    div.stButton > button[kind="secondary"] {
+        border-radius: 7px !important;
         font-weight: 600 !important;
-        font-size: 0.82rem !important;
-        border: 1px solid #334155 !important;
-        background: #1e293b !important;
-        color: #f1f5f9 !important;
+        font-size: 0.8rem !important;
+        border: 1px solid rgba(148, 163, 184, 0.16) !important;
+        background: #131d2e !important;
+        color: #cbd5e1 !important;
         transition: all 0.15s ease !important;
-        padding: 4px 10px !important;
+        padding: 5px 8px !important;
     }
-    div.stButton > button:hover {
-        background: #2563eb !important;
+    div.stButton > button:hover,
+    div.stButton > button[kind="secondary"]:hover {
+        background: #1e2c45 !important;
         border-color: #3b82f6 !important;
         color: #ffffff !important;
     }
 
+    /* Primary Active Buttons */
+    div.stButton > button[kind="primary"] {
+        border-radius: 7px !important;
+        font-weight: 700 !important;
+        font-size: 0.8rem !important;
+        background: #2563eb !important;
+        border: 1px solid #60a5fa !important;
+        color: #ffffff !important;
+        box-shadow: 0 2px 10px rgba(37, 99, 235, 0.35) !important;
+        padding: 5px 8px !important;
+    }
+    div.stButton > button[kind="primary"]:hover {
+        background: #1d4ed8 !important;
+        border-color: #93c5fd !important;
+    }
+
     /* Primary Download Button */
     .stDownloadButton button {
-        background: #0284c7 !important;
+        background: linear-gradient(135deg, #0284c7, #2563eb) !important;
         color: #ffffff !important;
         font-weight: 700 !important;
         font-size: 0.88rem !important;
-        border: 1px solid #0369a1 !important;
-        border-radius: 6px !important;
+        border: 1px solid rgba(96, 165, 250, 0.4) !important;
+        border-radius: 7px !important;
         padding: 8px 18px !important;
         width: 100% !important;
         transition: all 0.2s ease !important;
+        box-shadow: 0 3px 12px rgba(37, 99, 235, 0.25) !important;
     }
     .stDownloadButton button:hover {
-        background: #0369a1 !important;
-        box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35) !important;
+        background: linear-gradient(135deg, #0369a1, #1d4ed8) !important;
+        box-shadow: 0 4px 16px rgba(37, 99, 235, 0.4) !important;
     }
     </style>
     """,
@@ -452,6 +494,11 @@ def webrtc_video_frame_callback(frame: "av.VideoFrame") -> "av.VideoFrame":
     return av.VideoFrame.from_ndarray(out_bgr, format="bgr24")
 
 
+def set_media_mode(mode: str):
+    """Callback triggered by top mode toggle buttons."""
+    st.session_state["media_mode"] = mode
+
+
 def on_button_select_filter(new_filter_name: str):
     """Callback triggered directly by filter buttons to update state cleanly."""
     st.session_state["active_filter"] = new_filter_name
@@ -497,10 +544,10 @@ def render_filter_thumbnails_bar(base_image: np.ndarray, active_filter: str):
             is_active = (active_filter == f_id)
             st.image(t_proc, use_container_width=True)
             
-            btn_label = f"{f_label} *" if is_active else f_label
             st.button(
-                btn_label,
+                f_label,
                 key=f"quick_btn_{f_id}",
+                type="primary" if is_active else "secondary",
                 on_click=on_button_select_filter,
                 args=(f_id,),
                 use_container_width=True,
@@ -665,25 +712,27 @@ def main():
 
     m_col1, m_col2, m_col3 = st.columns([1.5, 1.5, 4])
     with m_col1:
-        if st.button(
+        st.button(
             "Photo Studio Mode",
+            key="mode_btn_photo",
             type="primary" if is_photo else "secondary",
+            on_click=set_media_mode,
+            args=("Photo Studio",),
             use_container_width=True,
-        ):
-            st.session_state["media_mode"] = "Photo Studio"
-            st.rerun()
+        )
 
     with m_col2:
-        if st.button(
+        st.button(
             "Live Camera Stream",
+            key="mode_btn_live",
             type="primary" if is_live else "secondary",
+            on_click=set_media_mode,
+            args=("Live Camera",),
             use_container_width=True,
-        ):
-            st.session_state["media_mode"] = "Live Camera"
-            st.rerun()
+        )
 
     with m_col3:
-        mode_desc = "Photo Studio: Compare original and processed image side-by-side" if is_photo else "Live Camera: Real-time webcam processing with 50/50 split"
+        mode_desc = "Photo Studio: Dual-view original vs filtered image with instant export" if is_photo else "Live Camera: Real-time browser webcam stream with 50/50 comparison"
         st.markdown(f"<div style='font-size: 0.8rem; color: #94a3b8; padding-top: 6px;'>{mode_desc}</div>", unsafe_allow_html=True)
 
     input_img = st.session_state["current_image"]
@@ -696,7 +745,7 @@ def main():
     f_col1, f_col2 = st.columns([3, 1])
     with f_col1:
         st.selectbox(
-            "Select from All 18 Filters:",
+            "Select Filter (All 19 Available):",
             FILTER_NAMES,
             key="filter_menu_select",
             on_change=on_dropdown_select_filter,
@@ -704,9 +753,13 @@ def main():
 
     with f_col2:
         st.markdown("<div style='height: 28px;'></div>", unsafe_allow_html=True)
-        if st.button("Reset to Original", use_container_width=True):
-            on_button_select_filter("Original")
-            st.rerun()
+        st.button(
+            "Reset to Original",
+            key="btn_reset_to_original",
+            on_click=on_button_select_filter,
+            args=("Original",),
+            use_container_width=True,
+        )
 
     # 3. Dynamic Filter Parameters
     with st.expander(f"Adjust Parameters: {active_filter}", expanded=False):
@@ -805,19 +858,19 @@ def main():
                 f"""
                 <div class="metric-row">
                     <div class="metric-box">
-                        <div class="metric-number">{latency_ms:.1f} ms</div>
+                        <div class="metric-number" style="color: #38bdf8;">{latency_ms:.1f} ms</div>
                         <div class="metric-title">Latency</div>
                     </div>
                     <div class="metric-box">
-                        <div class="metric-number">{fps:.0f}</div>
+                        <div class="metric-number" style="color: #34d399;">{fps:.0f}</div>
                         <div class="metric-title">FPS</div>
                     </div>
                     <div class="metric-box">
-                        <div class="metric-number">{w}x{h}</div>
+                        <div class="metric-number" style="color: #a78bfa;">{w}x{h}</div>
                         <div class="metric-title">Resolution</div>
                     </div>
                     <div class="metric-box">
-                        <div class="metric-number">{'4 (RGBA)' if is_rgba else '3 (RGB)'}</div>
+                        <div class="metric-number" style="color: #fbbf24;">{'4 (RGBA)' if is_rgba else '3 (RGB)'}</div>
                         <div class="metric-title">Channels</div>
                     </div>
                 </div>

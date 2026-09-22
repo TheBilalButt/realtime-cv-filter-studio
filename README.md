@@ -9,13 +9,15 @@
 
 > **Built by Bilal Butt**  
 > A fast, responsive, and lightweight real-time Computer Vision filter studio built with Python, OpenCV, NumPy, and Streamlit.  
-> Public Access Link: [Deploy / Launch on Streamlit Community Cloud](https://share.streamlit.io/deploy?repository=TheBilalButt/realtime-cv-filter-studio&branch=main&mainModule=app.py)
+> 
+> **Live Working Application**: [https://thebilalbutt-realtime-cv-filter-studio-app-uy8byn.streamlit.app](https://thebilalbutt-realtime-cv-filter-studio-app-uy8byn.streamlit.app)  
+> **Source Repository**: [https://github.com/TheBilalButt/realtime-cv-filter-studio](https://github.com/TheBilalButt/realtime-cv-filter-studio)
 
 ---
 
 ## Project Overview
 
-Real Time Computer Vision Filter Studio is a high-performance web application designed for interactive image and video processing. It allows users to apply 18 distinct computer vision filters, tune algorithm parameters dynamically with live sliders, compare before/after images side-by-side in real time, and inspect processing latency and FPS metrics.
+Real Time Computer Vision Filter Studio is a high-performance web application designed for interactive image and video processing. It allows users to apply 19 distinct computer vision filters, tune algorithm parameters dynamically with live sliders, compare before/after images side-by-side in real time, and inspect processing latency and FPS metrics.
 
 The system is optimized for speed on consumer laptops, leveraging vectorized NumPy/OpenCV routines and a cached lightweight deep learning model (LRASPP MobileNetV3) for real-time background segmentation and bokeh simulation.
 
