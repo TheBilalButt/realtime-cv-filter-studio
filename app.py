@@ -248,6 +248,7 @@ st.markdown(
 # Filter catalog
 FILTERS_CATALOG = [
     {"id": "Original", "name": "Original", "desc": "Unprocessed reference source input."},
+    {"id": "Document Scanner", "name": "Doc Clean", "desc": "Removes shadows and page creases, turning paper pure white while keeping writing crisp."},
     {"id": "Cartoon Effect", "name": "Cartoon", "desc": "Edge-preserving bilateral filter with color quantization."},
     {"id": "Background Blur", "name": "Background Blur", "desc": "Foreground segmentation with depth bokeh blur."},
     {"id": "Background Removal", "name": "Background Removal", "desc": "Alpha extraction producing transparent PNG cutout."},
@@ -299,6 +300,13 @@ def apply_filter_pipeline(image_rgb: np.ndarray, filter_name: str, params: dict)
 
     if filter_name == "Original":
         processed = filters.apply_original(image_rgb)
+    elif filter_name == "Document Scanner":
+        processed = filters.apply_document_scanner(
+            image_rgb,
+            contrast=params.get("contrast", 1.25),
+            brightness=params.get("brightness", 15),
+            mode=params.get("mode", "Color Document"),
+        )
     elif filter_name == "Grayscale":
         processed = filters.apply_grayscale(image_rgb)
     elif filter_name == "Gaussian Blur":
@@ -464,6 +472,7 @@ def render_filter_thumbnails_bar(base_image: np.ndarray, active_filter: str):
 
     gallery_keys = [
         ("Original", "Original", lambda img: filters.apply_original(img)),
+        ("Document Scanner", "Doc Clean", lambda img: filters.apply_document_scanner(img)),
         ("Cartoon Effect", "Cartoon", lambda img: filters.apply_cartoon(img, 1, 8, 5)),
         ("Background Blur", "BG Blur", lambda img: background.apply_background_blur(img, 25, 3, 0.4, False)),
         ("Background Removal", "Cutout", lambda img: background.apply_background_removal(img, "Studio Grey", (200, 200, 200), 3, 0.4, False)),
@@ -504,7 +513,16 @@ def render_parameter_controls(active_filter: str) -> dict:
 
     st.markdown(f"<div style='font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #38bdf8; margin-bottom: 6px;'>Parameters: {active_filter}</div>", unsafe_allow_html=True)
 
-    if active_filter == "Cartoon Effect":
+    if active_filter == "Document Scanner":
+        c1, c2, c3 = st.columns(3)
+        with c1:
+            params["mode"] = st.selectbox("Scan Mode", ["Color Document", "Black and White Scan"])
+        with c2:
+            params["contrast"] = st.slider("Text & Ink Contrast", 0.8, 2.5, 1.25, step=0.05)
+        with c3:
+            params["brightness"] = st.slider("Paper Whitener Boost", 0, 50, 15, step=5)
+
+    elif active_filter == "Cartoon Effect":
         c1, c2, c3 = st.columns(3)
         with c1:
             params["num_bilateral"] = st.slider("Bilateral Passes (Smoothing)", 1, 5, 2, step=1)
@@ -839,6 +857,7 @@ def main():
             with c_src2:
                 sample_options = {
                     "Portrait Demo (AI Background)": "portrait.jpg",
+                    "Document Notes (Shadow Removal Demo)": "document.jpg",
                     "Landscape Demo (Textures & Edges)": "landscape.jpg",
                 }
                 chosen_sample = st.selectbox("Or Choose Preset Sample:", list(sample_options.keys()))

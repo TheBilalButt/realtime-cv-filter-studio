@@ -55,7 +55,26 @@ def create_sample_images(output_dir="assets"):
     cv2.circle(landscape, (680, 120), 45, (120, 220, 255), -1)
     
     cv2.imwrite(os.path.join(output_dir, "landscape.jpg"), landscape)
+
+    # 3. Create realistic sample document page with uneven shadow and handwritten notes
+    doc = np.full((h, w, 3), 205, dtype=np.uint8)
+    for y in range(h):
+        shadow = int(65 * (y / h))
+        doc[y, :] = np.clip(doc[y, :] - shadow, 0, 255)
+    
+    cv2.putText(doc, "LECTURE NOTES - COMPUTER VISION", (40, 70), cv2.FONT_HERSHEY_DUPLEX, 0.9, (10, 10, 120), 2)
+    cv2.line(doc, (40, 85), (760, 85), (80, 80, 80), 2)
+    cv2.putText(doc, "1. Real-time paper and document cleaning", (50, 140), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (25, 25, 25), 2)
+    cv2.putText(doc, "   - Normalizes background illumination across shadows", (50, 185), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (40, 40, 40), 2)
+    cv2.putText(doc, "   - Eliminates yellow tint, creases and low-light noise", (50, 230), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (40, 40, 40), 2)
+    cv2.putText(doc, "   - Turns paper surface into pure 255 white", (50, 275), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (40, 40, 40), 2)
+    cv2.putText(doc, "2. Handwritten pen ink preserved with high contrast", (50, 340), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (160, 20, 20), 2)
+    cv2.putText(doc, "   - Blue ink, red pen, and graphite marks stay crisp", (50, 385), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (20, 20, 160), 2)
+    cv2.putText(doc, "Sign: Bilal Butt | Verified Clean Page", (50, 480), cv2.FONT_HERSHEY_SCRIPT_SIMPLEX, 1.1, (10, 10, 10), 2)
+    
+    cv2.imwrite(os.path.join(output_dir, "document.jpg"), doc)
     print("Created sample images successfully.")
 
 if __name__ == "__main__":
     create_sample_images()
+

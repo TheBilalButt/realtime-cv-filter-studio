@@ -240,3 +240,35 @@ def apply_cartoon(
     # Step 4: Combine flattened colors with sharp edges
     cartoon = cv2.bitwise_and(color, edges_rgb)
     return cartoon
+
+
+def apply_document_scanner(
+    image: np.ndarray,
+    contrast: float = 1.25,
+    brightness: int = 15,
+    mode: Literal["Color Document", "Black and White Scan"] = "Color Document",
+) -> np.ndarray:
+    """
+    Cleans written pages, whiteboards, notes, and documents in real time:
+    - Removes shadows, yellowish tints, creases, and uneven ambient lighting
+    - Makes the paper background crystal-clear pure white (255, 255, 255)
+    - Keeps ink (handwriting, pen strokes, print) sharp and legible
+    """
+    gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
+    
+    # Estimate background illumination surface
+    dilated = cv2.dilate(gray, np.ones((7, 7), np.uint8))
+    bg = cv2.medianBlur(dilated, 21)
+
+    if mode == "Black and White Scan":
+        diff = 255 - cv2.absdiff(gray, bg)
+        norm = cv2.normalize(diff, None, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_8UC1)
+        binary = cv2.adaptiveThreshold(norm, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 21, 10)
+        return cv2.cvtColor(binary, cv2.COLOR_GRAY2RGB)
+
+    # Color Document mode: normalize RGB channels by estimated luminance background
+    bg_f = np.maximum(bg.astype(np.float32), 1.0)
+    norm = (image.astype(np.float32) / bg_f[:, :, None]) * 255.0
+    stretched = np.clip(norm * float(contrast) + int(brightness), 0, 255).astype(np.uint8)
+    return stretched
+
