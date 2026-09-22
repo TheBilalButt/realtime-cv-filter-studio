@@ -4,10 +4,12 @@
 [![OpenCV](https://img.shields.io/badge/OpenCV-5.0+-green.svg)](https://opencv.org/)
 [![Streamlit](https://img.shields.io/badge/Streamlit-1.40+-FF4B4B.svg)](https://streamlit.io/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-LRASPP%20MobileNet-EE4C2C.svg)](https://pytorch.org/)
+[![Deploy with Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://share.streamlit.io/deploy?repository=TheBilalButt/realtime-cv-filter-studio&branch=main&mainModule=app.py)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 > **Built by Bilal Butt**  
-> A fast, responsive, and lightweight real-time Computer Vision filter studio built with Python, OpenCV, NumPy, and Streamlit.
+> A fast, responsive, and lightweight real-time Computer Vision filter studio built with Python, OpenCV, NumPy, and Streamlit.  
+> 🌐 **Public Access Link**: [Deploy / Launch on Streamlit Community Cloud](https://share.streamlit.io/deploy?repository=TheBilalButt/realtime-cv-filter-studio&branch=main&mainModule=app.py)
 
 ---
 
@@ -136,7 +138,7 @@ realtime-cv-filter-studio/
 ### 1. Clone the repository
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/TheBilalButt/realtime-cv-filter-studio.git
 cd realtime-cv-filter-studio
 ```
 
