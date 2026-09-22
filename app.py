@@ -28,19 +28,21 @@ import utils
 # --- Thread-Safe Holder for Live WebRTC Processing ---
 class LiveFilterHolder:
     _lock = threading.Lock()
-    _filter_name = "Original"
+    _filter_name = "Cartoon Effect"
     _params = {}
+    _split_view = True
 
     @classmethod
-    def set(cls, filter_name, params):
+    def set(cls, filter_name, params, split_view=True):
         with cls._lock:
             cls._filter_name = filter_name
             cls._params = params
+            cls._split_view = split_view
 
     @classmethod
     def get(cls):
         with cls._lock:
-            return cls._filter_name, cls._params
+            return cls._filter_name, cls._params, cls._split_view
 
 
 # STUN servers for NAT traversal on remote hosts
@@ -82,7 +84,7 @@ st.markdown(
 
     /* Container Spacing */
     .block-container {
-        padding-top: 1.5rem !important;
+        padding-top: 1rem !important;
         padding-bottom: 2rem !important;
         max-width: 1360px !important;
     }
@@ -93,54 +95,49 @@ st.markdown(
         justify-content: space-between;
         align-items: center;
         border-bottom: 1px solid #1e293b;
-        padding-bottom: 0.85rem;
-        margin-bottom: 1rem;
+        padding-bottom: 0.6rem;
+        margin-bottom: 0.8rem;
         flex-wrap: wrap;
-        gap: 12px;
+        gap: 10px;
     }
     .studio-title {
         font-family: 'Space Grotesk', sans-serif !important;
-        font-size: 1.85rem;
+        font-size: 1.65rem;
         font-weight: 700;
         letter-spacing: -0.02em;
         color: #f8fafc;
         margin: 0;
     }
     .studio-subtitle {
-        font-size: 0.88rem;
+        font-size: 0.82rem;
         color: #94a3b8;
-        margin-top: 2px;
+        margin-top: 1px;
     }
     .author-badge {
-        font-size: 0.8rem;
+        font-size: 0.76rem;
         font-weight: 700;
         letter-spacing: 0.05em;
         text-transform: uppercase;
         color: #38bdf8;
         background: rgba(56, 189, 248, 0.08);
         border: 1px solid rgba(56, 189, 248, 0.3);
-        padding: 6px 14px;
+        padding: 4px 12px;
         border-radius: 6px;
     }
 
-    /* Mode Switch Banner */
-    .mode-bar {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        background: #111827;
-        border: 1px solid #1f2937;
-        border-radius: 8px;
-        padding: 8px 14px;
-        margin-bottom: 1.25rem;
+    /* Compact Responsive Camera Frame */
+    div[data-testid="stWebRtcStreamer"] {
+        max-width: 680px !important;
+        margin: 0 auto !important;
+        border-radius: 8px !important;
+        overflow: hidden !important;
+        background: #030712 !important;
+        border: 1px solid #1f2937 !important;
     }
-    .mode-label {
-        font-size: 0.8rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.06em;
-        color: #94a3b8;
-        margin-right: 6px;
+    div[data-testid="stWebRtcStreamer"] video {
+        max-height: 380px !important;
+        width: 100% !important;
+        object-fit: contain !important;
     }
 
     /* Stage Panel & Labels */
@@ -152,17 +149,17 @@ st.markdown(
         border: 1px solid #1f2937;
         border-bottom: none;
         border-radius: 8px 8px 0 0;
-        padding: 8px 14px;
+        padding: 6px 12px;
     }
     .panel-label {
-        font-size: 0.78rem;
+        font-size: 0.75rem;
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.08em;
         color: #94a3b8;
     }
     .panel-status {
-        font-size: 0.72rem;
+        font-size: 0.7rem;
         font-weight: 600;
         color: #38bdf8;
         background: rgba(56, 189, 248, 0.12);
@@ -176,49 +173,49 @@ st.markdown(
         border-radius: 0 0 8px 8px;
         background: #030712;
         overflow: hidden;
-        margin-bottom: 0.75rem;
+        margin-bottom: 0.5rem;
     }
 
     /* Performance Metric Cards */
     .metric-row {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
-        gap: 10px;
-        margin-top: 0.5rem;
-        margin-bottom: 0.75rem;
+        gap: 8px;
+        margin-top: 0.4rem;
+        margin-bottom: 0.5rem;
     }
     .metric-box {
         background: #111827;
         border: 1px solid #1f2937;
-        border-radius: 8px;
-        padding: 10px;
+        border-radius: 6px;
+        padding: 6px 8px;
         text-align: center;
     }
     .metric-number {
         font-family: 'Space Grotesk', monospace;
-        font-size: 1.25rem;
+        font-size: 1.15rem;
         font-weight: 700;
         color: #f8fafc;
     }
     .metric-title {
-        font-size: 0.72rem;
+        font-size: 0.68rem;
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.05em;
         color: #64748b;
-        margin-top: 2px;
+        margin-top: 1px;
     }
 
     /* Action Buttons */
     div.stButton > button {
         border-radius: 6px !important;
         font-weight: 600 !important;
-        font-size: 0.85rem !important;
+        font-size: 0.82rem !important;
         border: 1px solid #334155 !important;
         background: #1e293b !important;
         color: #f1f5f9 !important;
         transition: all 0.15s ease !important;
-        padding: 6px 12px !important;
+        padding: 4px 10px !important;
     }
     div.stButton > button:hover {
         background: #2563eb !important;
@@ -231,10 +228,10 @@ st.markdown(
         background: #0284c7 !important;
         color: #ffffff !important;
         font-weight: 700 !important;
-        font-size: 0.95rem !important;
+        font-size: 0.88rem !important;
         border: 1px solid #0369a1 !important;
         border-radius: 6px !important;
-        padding: 10px 24px !important;
+        padding: 8px 18px !important;
         width: 100% !important;
         transition: all 0.2s ease !important;
     }
@@ -248,7 +245,7 @@ st.markdown(
 )
 
 
-# Filter definitions with short technical description
+# Filter catalog
 FILTERS_CATALOG = [
     {"id": "Original", "name": "Original", "desc": "Unprocessed reference source input."},
     {"id": "Cartoon Effect", "name": "Cartoon", "desc": "Edge-preserving bilateral filter with color quantization."},
@@ -282,7 +279,7 @@ def load_segmentation_model():
         return None
 
 
-# Pre-warm model in background
+# Pre-warm model
 _ = load_segmentation_model()
 
 
@@ -409,34 +406,59 @@ def apply_filter_pipeline(image_rgb: np.ndarray, filter_name: str, params: dict)
 
 
 def webrtc_video_frame_callback(frame: "av.VideoFrame") -> "av.VideoFrame":
-    """Real-time frame processing callback for WebRTC live camera."""
+    """
+    Real-time frame processing callback for WebRTC live camera.
+    Supports real-time 50/50 split (Original Left | Filter Right) with zero latency.
+    """
     img_bgr = frame.to_ndarray(format="bgr24")
     img_rgb = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
 
-    cur_filter, cur_params = LiveFilterHolder.get()
+    cur_filter, cur_params, cur_split = LiveFilterHolder.get()
     try:
         processed, _, _ = apply_filter_pipeline(img_rgb, cur_filter, cur_params)
         if processed.ndim == 3 and processed.shape[2] == 4:
             alpha = processed[:, :, 3:4] / 255.0
             fg = processed[:, :, :3]
             bg = np.full_like(fg, 20)
-            comp = (fg * alpha + bg * (1.0 - alpha)).astype(np.uint8)
-            out_bgr = cv2.cvtColor(comp, cv2.COLOR_RGB2BGR)
+            processed_bgr = cv2.cvtColor((fg * alpha + bg * (1.0 - alpha)).astype(np.uint8), cv2.COLOR_RGB2BGR)
         else:
-            out_bgr = cv2.cvtColor(processed, cv2.COLOR_RGB2BGR)
+            processed_bgr = cv2.cvtColor(processed, cv2.COLOR_RGB2BGR)
+
+        # 50/50 Real-time split
+        if cur_split and cur_filter != "Original":
+            h, w = img_bgr.shape[:2]
+            split_x = w // 2
+            out_bgr = img_bgr.copy()
+            out_bgr[:, split_x:] = processed_bgr[:, split_x:]
+
+            # Divider line and text badges
+            cv2.line(out_bgr, (split_x, 0), (split_x, h), (255, 255, 255), 2)
+            cv2.putText(out_bgr, "ORIGINAL", (12, 28), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
+            cv2.putText(out_bgr, cur_filter.upper()[:12], (split_x + 12, 28), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (56, 189, 248), 2)
+        else:
+            out_bgr = processed_bgr
+
     except Exception:
         out_bgr = img_bgr
 
     return av.VideoFrame.from_ndarray(out_bgr, format="bgr24")
 
 
+def on_button_select_filter(new_filter_name: str):
+    """Callback triggered directly by filter buttons to update state cleanly."""
+    st.session_state["active_filter"] = new_filter_name
+    st.session_state["filter_menu_select"] = new_filter_name
+
+
+def on_dropdown_select_filter():
+    """Callback triggered by dropdown menu."""
+    st.session_state["active_filter"] = st.session_state["filter_menu_select"]
+
+
 def render_filter_thumbnails_bar(base_image: np.ndarray, active_filter: str):
-    """
-    Generates miniature previews for the key filters and displays an interactive gallery.
-    Clicking any card selects the filter immediately.
-    """
+    """Generates miniature previews for key filters and displays clickable buttons."""
     h, w = base_image.shape[:2]
-    thumb_w = 90
+    thumb_w = 80
     thumb_h = max(1, int(round(thumb_w * h / w)))
     thumb = cv2.resize(base_image, (thumb_w, thumb_h), interpolation=cv2.INTER_AREA)
 
@@ -453,7 +475,7 @@ def render_filter_thumbnails_bar(base_image: np.ndarray, active_filter: str):
         ("Threshold", "Threshold", lambda img: filters.apply_threshold(img, 127)),
     ]
 
-    st.markdown("<div style='font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; margin-bottom: 8px;'>Filter Quick Bar (Click to apply)</div>", unsafe_allow_html=True)
+    st.markdown("<div style='font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; margin-bottom: 6px;'>Quick Filter Bar (Click to apply)</div>", unsafe_allow_html=True)
     
     cols = st.columns(len(gallery_keys))
     for i, (f_id, f_label, f_fn) in enumerate(gallery_keys):
@@ -464,20 +486,23 @@ def render_filter_thumbnails_bar(base_image: np.ndarray, active_filter: str):
                 t_proc = thumb
 
             is_active = (active_filter == f_id)
-
             st.image(t_proc, use_container_width=True)
             
             btn_label = f"{f_label} *" if is_active else f_label
-            if st.button(btn_label, key=f"quick_btn_{f_id}", use_container_width=True):
-                st.session_state["active_filter"] = f_id
-                st.rerun()
+            st.button(
+                btn_label,
+                key=f"quick_btn_{f_id}",
+                on_click=on_button_select_filter,
+                args=(f_id,),
+                use_container_width=True,
+            )
 
 
 def render_parameter_controls(active_filter: str) -> dict:
     """Renders parameter sliders and controls for the active filter."""
     params = {}
 
-    st.markdown(f"<div style='font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #38bdf8; margin-bottom: 8px;'>Parameter Controls: {active_filter}</div>", unsafe_allow_html=True)
+    st.markdown(f"<div style='font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #38bdf8; margin-bottom: 6px;'>Parameters: {active_filter}</div>", unsafe_allow_html=True)
 
     if active_filter == "Cartoon Effect":
         c1, c2, c3 = st.columns(3)
@@ -590,13 +615,19 @@ def main():
     if "active_filter" not in st.session_state:
         st.session_state["active_filter"] = "Cartoon Effect"
 
+    if "filter_menu_select" not in st.session_state:
+        st.session_state["filter_menu_select"] = st.session_state["active_filter"]
+
     if "current_image" not in st.session_state:
         st.session_state["current_image"] = get_default_image()
 
     if "media_mode" not in st.session_state:
         st.session_state["media_mode"] = "Photo Studio"
 
-    # --- Header Bar ---
+    if "live_split_view" not in st.session_state:
+        st.session_state["live_split_view"] = True
+
+    # Header Bar
     st.markdown(
         """
         <div class="studio-header">
@@ -610,7 +641,7 @@ def main():
         unsafe_allow_html=True,
     )
 
-    # --- Top Mode Switcher Buttons (No clumsy tabs) ---
+    # Top Mode Switcher Buttons
     is_photo = (st.session_state["media_mode"] == "Photo Studio")
     is_live = (st.session_state["media_mode"] == "Live Camera")
 
@@ -634,60 +665,62 @@ def main():
             st.rerun()
 
     with m_col3:
-        mode_desc = "Photo Studio: Compare original and processed image side-by-side" if is_photo else "Live Camera: Stream your browser webcam and switch filters in real time"
-        st.markdown(f"<div style='font-size: 0.82rem; color: #94a3b8; padding-top: 8px;'>{mode_desc}</div>", unsafe_allow_html=True)
-
-    st.markdown("<hr style='margin: 12px 0; opacity: 0.15;'>", unsafe_allow_html=True)
+        mode_desc = "Photo Studio: Compare original and processed image side-by-side" if is_photo else "Live Camera: Real-time webcam processing with 50/50 split"
+        st.markdown(f"<div style='font-size: 0.8rem; color: #94a3b8; padding-top: 6px;'>{mode_desc}</div>", unsafe_allow_html=True)
 
     input_img = st.session_state["current_image"]
     active_filter = st.session_state["active_filter"]
 
-    # 1. Unified Filter Thumbnails Quick Bar (Available in both modes!)
+    # 1. Filter Thumbnails Quick Bar (Reliable callbacks, no overrides)
     render_filter_thumbnails_bar(input_img, active_filter)
 
     # 2. Filter Selector Dropdown & Reset Button
     f_col1, f_col2 = st.columns([3, 1])
     with f_col1:
-        selected_from_menu = st.selectbox(
-            "Active Filter:",
+        st.selectbox(
+            "Select from All 18 Filters:",
             FILTER_NAMES,
-            index=FILTER_NAMES.index(active_filter) if active_filter in FILTER_NAMES else 0,
             key="filter_menu_select",
+            on_change=on_dropdown_select_filter,
         )
-        if selected_from_menu != active_filter:
-            st.session_state["active_filter"] = selected_from_menu
-            st.rerun()
 
     with f_col2:
         st.markdown("<div style='height: 28px;'></div>", unsafe_allow_html=True)
-        if st.button("Reset Filter", use_container_width=True):
-            st.session_state["active_filter"] = "Original"
+        if st.button("Reset to Original", use_container_width=True):
+            on_button_select_filter("Original")
             st.rerun()
 
-    # 3. Dynamic Filter Parameters (Immediate real-time feedback)
-    with st.expander(f"Adjust Parameters: {active_filter}", expanded=True):
+    # 3. Dynamic Filter Parameters
+    with st.expander(f"Adjust Parameters: {active_filter}", expanded=False):
         params = render_parameter_controls(active_filter)
 
-    # Synchronize live thread holder for instantaneous WebRTC update
-    LiveFilterHolder.set(active_filter, params)
-
-    st.markdown("<hr style='margin: 14px 0; opacity: 0.15;'>", unsafe_allow_html=True)
+    # Sync live thread holder for instantaneous WebRTC update
+    LiveFilterHolder.set(active_filter, params, split_view=st.session_state["live_split_view"])
 
     # =========================================================================
-    # VIEW A: LIVE CAMERA STREAM VIEW
+    # VIEW A: LIVE CAMERA STREAM VIEW (Compact, Centered, 50/50 Split)
     # =========================================================================
     if is_live:
-        st.markdown(
-            f"""
-            <div class="panel-header" style="border-radius: 8px;">
-                <span class="panel-label">Live Camera Viewport</span>
-                <span class="panel-status">Active Filter: {active_filter}</span>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-
-        st.markdown("<div style='font-size: 0.85rem; color: #94a3b8; margin-top: 6px; margin-bottom: 10px;'>Click <b>START</b> below to begin streaming. As you click any filter above or adjust sliders, the video feed updates immediately in real time!</div>", unsafe_allow_html=True)
+        cam_bar1, cam_bar2 = st.columns([2, 1])
+        with cam_bar1:
+            st.markdown(
+                f"""
+                <div class="panel-header" style="border-radius: 6px 6px 0 0;">
+                    <span class="panel-label">Live Camera Viewport (50/50 Split Enabled)</span>
+                    <span class="panel-status">Active Filter: {active_filter}</span>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+        with cam_bar2:
+            split_toggle = st.checkbox(
+                "50/50 Split (Original Left | Filter Right)",
+                value=st.session_state["live_split_view"],
+            )
+            if split_toggle != st.session_state["live_split_view"]:
+                st.session_state["live_split_view"] = split_toggle
+                LiveFilterHolder.set(active_filter, params, split_view=split_toggle)
+                st.rerun()
 
         if HAS_WEBRTC:
             webrtc_streamer(
@@ -697,6 +730,7 @@ def main():
                 media_stream_constraints={"video": {"width": {"ideal": 640}, "height": {"ideal": 480}}, "audio": False},
                 async_processing=True,
             )
+            st.caption("Click START above. The left half displays your original camera feed; the right half displays the filter in real time. Click any filter button above to switch instantly!")
         else:
             st.error("WebRTC streaming module is not available in the current environment.")
 
@@ -704,7 +738,6 @@ def main():
     # VIEW B: PHOTO STUDIO (Original Image | Processed Image Side-by-Side)
     # =========================================================================
     else:
-        # Scale for optimal real-time responsiveness if exceeds 1080p
         scaled_input = utils.resize_image_max_dim(input_img, max_dim=1080)
         h, w = scaled_input.shape[:2]
 
