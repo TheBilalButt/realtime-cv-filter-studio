@@ -93,8 +93,8 @@ st.markdown(
         justify-content: space-between;
         align-items: center;
         border-bottom: 1px solid #1e293b;
-        padding-bottom: 1rem;
-        margin-bottom: 1.25rem;
+        padding-bottom: 0.85rem;
+        margin-bottom: 1rem;
         flex-wrap: wrap;
         gap: 12px;
     }
@@ -107,7 +107,7 @@ st.markdown(
         margin: 0;
     }
     .studio-subtitle {
-        font-size: 0.9rem;
+        font-size: 0.88rem;
         color: #94a3b8;
         margin-top: 2px;
     }
@@ -121,6 +121,26 @@ st.markdown(
         border: 1px solid rgba(56, 189, 248, 0.3);
         padding: 6px 14px;
         border-radius: 6px;
+    }
+
+    /* Mode Switch Banner */
+    .mode-bar {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: #111827;
+        border: 1px solid #1f2937;
+        border-radius: 8px;
+        padding: 8px 14px;
+        margin-bottom: 1.25rem;
+    }
+    .mode-label {
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #94a3b8;
+        margin-right: 6px;
     }
 
     /* Stage Panel & Labels */
@@ -165,7 +185,7 @@ st.markdown(
         grid-template-columns: repeat(4, 1fr);
         gap: 10px;
         margin-top: 0.5rem;
-        margin-bottom: 1rem;
+        margin-bottom: 0.75rem;
     }
     .metric-box {
         background: #111827;
@@ -189,44 +209,6 @@ st.markdown(
         margin-top: 2px;
     }
 
-    /* Filter Cards & Thumbnails */
-    .filter-card {
-        border: 1px solid #1e293b;
-        border-radius: 8px;
-        background: #0f172a;
-        padding: 6px;
-        text-align: center;
-        transition: all 0.2s ease;
-        margin-bottom: 8px;
-    }
-    .filter-card:hover {
-        border-color: #38bdf8;
-        transform: translateY(-2px);
-    }
-    .filter-card.active {
-        border: 2px solid #38bdf8 !important;
-        background: rgba(56, 189, 248, 0.1) !important;
-        box-shadow: 0 0 12px rgba(56, 189, 248, 0.25);
-    }
-    .filter-title {
-        font-size: 0.76rem;
-        font-weight: 700;
-        color: #e2e8f0;
-        margin-top: 4px;
-        text-transform: uppercase;
-        letter-spacing: 0.04em;
-    }
-
-    /* Control Box */
-    .controls-container {
-        background: #111827;
-        border: 1px solid #1f2937;
-        border-radius: 8px;
-        padding: 16px 20px;
-        margin-top: 1rem;
-        margin-bottom: 1rem;
-    }
-
     /* Action Buttons */
     div.stButton > button {
         border-radius: 6px !important;
@@ -236,7 +218,7 @@ st.markdown(
         background: #1e293b !important;
         color: #f1f5f9 !important;
         transition: all 0.15s ease !important;
-        padding: 6px 14px !important;
+        padding: 6px 12px !important;
     }
     div.stButton > button:hover {
         background: #2563eb !important;
@@ -244,16 +226,7 @@ st.markdown(
         color: #ffffff !important;
     }
 
-    /* Active Filter Button Highlight */
-    .active-filter-btn button {
-        background: #2563eb !important;
-        border-color: #60a5fa !important;
-        color: #ffffff !important;
-        font-weight: 700 !important;
-        box-shadow: 0 0 10px rgba(37, 99, 235, 0.4) !important;
-    }
-
-    /* Download Button */
+    /* Primary Download Button */
     .stDownloadButton button {
         background: #0284c7 !important;
         color: #ffffff !important;
@@ -269,28 +242,6 @@ st.markdown(
         background: #0369a1 !important;
         box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35) !important;
     }
-
-    /* Tabs Styling */
-    .stTabs [data-baseweb="tab-list"] {
-        gap: 8px;
-        background: #111827;
-        padding: 4px;
-        border-radius: 8px;
-        border: 1px solid #1f2937;
-        margin-bottom: 1rem;
-    }
-    .stTabs [data-baseweb="tab"] {
-        border-radius: 6px !important;
-        padding: 6px 18px !important;
-        font-weight: 600 !important;
-        font-size: 0.88rem !important;
-        color: #94a3b8 !important;
-        border: none !important;
-    }
-    .stTabs [aria-selected="true"] {
-        background: #1e293b !important;
-        color: #38bdf8 !important;
-    }
     </style>
     """,
     unsafe_allow_html=True,
@@ -299,96 +250,24 @@ st.markdown(
 
 # Filter definitions with short technical description
 FILTERS_CATALOG = [
-    {
-        "id": "Original",
-        "name": "Original",
-        "desc": "Unprocessed reference source input.",
-    },
-    {
-        "id": "Grayscale",
-        "name": "Grayscale",
-        "desc": "Rec. 601 single-channel luminance conversion.",
-    },
-    {
-        "id": "Gaussian Blur",
-        "name": "Gaussian Blur",
-        "desc": "2D Gaussian kernel low-pass spatial smoothing.",
-    },
-    {
-        "id": "Median Blur",
-        "name": "Median Blur",
-        "desc": "Non-linear filter removing impulse and salt-pepper noise.",
-    },
-    {
-        "id": "Sharpen",
-        "name": "Sharpen",
-        "desc": "High-frequency unsharp masking enhancement.",
-    },
-    {
-        "id": "Edge Detection",
-        "name": "Edge Detection",
-        "desc": "Spatial gradient edge detection via Sobel / Laplacian.",
-    },
-    {
-        "id": "Canny Edge Detection",
-        "name": "Canny Edge",
-        "desc": "Multi-stage optimal hysteresis edge detector.",
-    },
-    {
-        "id": "Threshold",
-        "name": "Threshold",
-        "desc": "Intensity segmentation (Binary or automated Otsu).",
-    },
-    {
-        "id": "Adaptive Threshold",
-        "name": "Adaptive Thresh",
-        "desc": "Local neighborhood adaptive thresholding.",
-    },
-    {
-        "id": "Brightness",
-        "name": "Brightness",
-        "desc": "Linear luminance offset across color channels.",
-    },
-    {
-        "id": "Contrast",
-        "name": "Contrast",
-        "desc": "Luminance scaling and dynamic range multiplier.",
-    },
-    {
-        "id": "Saturation",
-        "name": "Saturation",
-        "desc": "HSV color space chromatic intensity scale.",
-    },
-    {
-        "id": "Negative",
-        "name": "Negative",
-        "desc": "Bitwise inversion of color intensity channels.",
-    },
-    {
-        "id": "Sepia",
-        "name": "Sepia",
-        "desc": "Three-channel photographic warm sepia matrix transform.",
-    },
-    {
-        "id": "Emboss",
-        "name": "Emboss",
-        "desc": "Directional relief convolution matrix with 128 bias.",
-    },
-    {
-        "id": "Cartoon Effect",
-        "name": "Cartoon",
-        "desc": "Edge-preserving bilateral filter with color quantization.",
-    },
-    {
-        "id": "Background Blur",
-        "name": "Background Blur",
-        "desc": "Foreground segmentation with background depth bokeh blur.",
-    },
-    {
-        "id": "Background Removal",
-        "name": "Background Removal",
-        "desc": "Alpha extraction producing clean transparent PNG cutout.",
-    },
+    {"id": "Original", "name": "Original", "desc": "Unprocessed reference source input."},
+    {"id": "Cartoon Effect", "name": "Cartoon", "desc": "Edge-preserving bilateral filter with color quantization."},
+    {"id": "Background Blur", "name": "Background Blur", "desc": "Foreground segmentation with depth bokeh blur."},
+    {"id": "Background Removal", "name": "Background Removal", "desc": "Alpha extraction producing transparent PNG cutout."},
+    {"id": "Grayscale", "name": "Grayscale", "desc": "Rec. 601 single-channel luminance conversion."},
+    {"id": "Sharpen", "name": "Sharpen", "desc": "High-frequency unsharp masking enhancement."},
+    {"id": "Canny Edge Detection", "name": "Canny Edge", "desc": "Multi-stage optimal hysteresis edge detector."},
+    {"id": "Sepia", "name": "Sepia", "desc": "Three-channel photographic warm sepia matrix transform."},
+    {"id": "Emboss", "name": "Emboss", "desc": "Directional relief convolution matrix with 128 bias."},
+    {"id": "Threshold", "name": "Threshold", "desc": "Intensity segmentation (Binary or automated Otsu)."},
+    {"id": "Gaussian Blur", "name": "Gaussian Blur", "desc": "2D Gaussian kernel low-pass spatial smoothing."},
+    {"id": "Median Blur", "name": "Median Blur", "desc": "Non-linear filter removing impulse noise."},
+    {"id": "Edge Detection", "name": "Edge Detection", "desc": "Spatial gradient edge detection via Sobel / Laplacian."},
+    {"id": "Adaptive Threshold", "name": "Adaptive Thresh", "desc": "Local neighborhood adaptive thresholding."},
+    {"id": "Brightness", "name": "Brightness", "desc": "Linear luminance offset across color channels."},
+    {"id": "Contrast", "name": "Contrast", "desc": "Luminance scaling and dynamic range multiplier."},
+    {"id": "Saturation", "name": "Saturation", "desc": "HSV color space chromatic intensity scale."},
+    {"id": "Negative", "name": "Negative", "desc": "Bitwise inversion of color intensity channels."},
 ]
 
 FILTER_NAMES = [f["id"] for f in FILTERS_CATALOG]
@@ -412,7 +291,6 @@ def get_default_image() -> np.ndarray:
     path = os.path.join(os.path.dirname(__file__), "assets", "portrait.jpg")
     if os.path.exists(path):
         return utils.load_image(path)
-    # Synthetic fallback
     synth = np.zeros((480, 640, 3), dtype=np.uint8)
     cv2.circle(synth, (320, 240), 120, (200, 180, 160), -1)
     return synth
@@ -557,17 +435,15 @@ def render_filter_thumbnails_bar(base_image: np.ndarray, active_filter: str):
     Generates miniature previews for the key filters and displays an interactive gallery.
     Clicking any card selects the filter immediately.
     """
-    # Downscale to 80px thumbnail for sub-millisecond generation
     h, w = base_image.shape[:2]
     thumb_w = 90
     thumb_h = max(1, int(round(thumb_w * h / w)))
     thumb = cv2.resize(base_image, (thumb_w, thumb_h), interpolation=cv2.INTER_AREA)
 
-    # Primary gallery filters to showcase
     gallery_keys = [
         ("Original", "Original", lambda img: filters.apply_original(img)),
         ("Cartoon Effect", "Cartoon", lambda img: filters.apply_cartoon(img, 1, 8, 5)),
-        ("Background Blur", "BG Blur", lambda img: filters.apply_background_blur(img, 25, 3, 0.4, False)),
+        ("Background Blur", "BG Blur", lambda img: background.apply_background_blur(img, 25, 3, 0.4, False)),
         ("Background Removal", "Cutout", lambda img: background.apply_background_removal(img, "Studio Grey", (200, 200, 200), 3, 0.4, False)),
         ("Grayscale", "Grayscale", lambda img: filters.apply_grayscale(img)),
         ("Sharpen", "Sharpen", lambda img: filters.apply_sharpen(img, 2.0)),
@@ -577,7 +453,7 @@ def render_filter_thumbnails_bar(base_image: np.ndarray, active_filter: str):
         ("Threshold", "Threshold", lambda img: filters.apply_threshold(img, 127)),
     ]
 
-    st.markdown("<div style='font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; margin-bottom: 8px;'>Filter Previews (Click to apply)</div>", unsafe_allow_html=True)
+    st.markdown("<div style='font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; margin-bottom: 8px;'>Filter Quick Bar (Click to apply)</div>", unsafe_allow_html=True)
     
     cols = st.columns(len(gallery_keys))
     for i, (f_id, f_label, f_fn) in enumerate(gallery_keys):
@@ -588,15 +464,11 @@ def render_filter_thumbnails_bar(base_image: np.ndarray, active_filter: str):
                 t_proc = thumb
 
             is_active = (active_filter == f_id)
-            active_class = "active" if is_active else ""
-            status_text = "[ACTIVE]" if is_active else ""
 
-            # Card image
             st.image(t_proc, use_container_width=True)
             
-            # Clickable button with active state styling
             btn_label = f"{f_label} *" if is_active else f_label
-            if st.button(btn_label, key=f"thumb_btn_{f_id}", use_container_width=True):
+            if st.button(btn_label, key=f"quick_btn_{f_id}", use_container_width=True):
                 st.session_state["active_filter"] = f_id
                 st.rerun()
 
@@ -605,7 +477,7 @@ def render_parameter_controls(active_filter: str) -> dict:
     """Renders parameter sliders and controls for the active filter."""
     params = {}
 
-    st.markdown(f"<div style='font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #38bdf8; margin-bottom: 10px;'>Parameter Controls: {active_filter}</div>", unsafe_allow_html=True)
+    st.markdown(f"<div style='font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #38bdf8; margin-bottom: 8px;'>Parameter Controls: {active_filter}</div>", unsafe_allow_html=True)
 
     if active_filter == "Cartoon Effect":
         c1, c2, c3 = st.columns(3)
@@ -708,7 +580,7 @@ def render_parameter_controls(active_filter: str) -> dict:
             params["max_val"] = 255
 
     else:
-        st.caption("This filter executes with standardized optimal parameters.")
+        st.caption("Standardized optimal parameters active.")
 
     return params
 
@@ -720,6 +592,9 @@ def main():
 
     if "current_image" not in st.session_state:
         st.session_state["current_image"] = get_default_image()
+
+    if "media_mode" not in st.session_state:
+        st.session_state["media_mode"] = "Photo Studio"
 
     # --- Header Bar ---
     st.markdown(
@@ -735,90 +610,106 @@ def main():
         unsafe_allow_html=True,
     )
 
-    # Top Tabs
-    tab_image_studio, tab_live_camera = st.tabs(["Image Studio", "Live Camera Stream"])
+    # --- Top Mode Switcher Buttons (No clumsy tabs) ---
+    is_photo = (st.session_state["media_mode"] == "Photo Studio")
+    is_live = (st.session_state["media_mode"] == "Live Camera")
+
+    m_col1, m_col2, m_col3 = st.columns([1.5, 1.5, 4])
+    with m_col1:
+        if st.button(
+            "Photo Studio Mode",
+            type="primary" if is_photo else "secondary",
+            use_container_width=True,
+        ):
+            st.session_state["media_mode"] = "Photo Studio"
+            st.rerun()
+
+    with m_col2:
+        if st.button(
+            "Live Camera Stream",
+            type="primary" if is_live else "secondary",
+            use_container_width=True,
+        ):
+            st.session_state["media_mode"] = "Live Camera"
+            st.rerun()
+
+    with m_col3:
+        mode_desc = "Photo Studio: Compare original and processed image side-by-side" if is_photo else "Live Camera: Stream your browser webcam and switch filters in real time"
+        st.markdown(f"<div style='font-size: 0.82rem; color: #94a3b8; padding-top: 8px;'>{mode_desc}</div>", unsafe_allow_html=True)
+
+    st.markdown("<hr style='margin: 12px 0; opacity: 0.15;'>", unsafe_allow_html=True)
+
+    input_img = st.session_state["current_image"]
+    active_filter = st.session_state["active_filter"]
+
+    # 1. Unified Filter Thumbnails Quick Bar (Available in both modes!)
+    render_filter_thumbnails_bar(input_img, active_filter)
+
+    # 2. Filter Selector Dropdown & Reset Button
+    f_col1, f_col2 = st.columns([3, 1])
+    with f_col1:
+        selected_from_menu = st.selectbox(
+            "Active Filter:",
+            FILTER_NAMES,
+            index=FILTER_NAMES.index(active_filter) if active_filter in FILTER_NAMES else 0,
+            key="filter_menu_select",
+        )
+        if selected_from_menu != active_filter:
+            st.session_state["active_filter"] = selected_from_menu
+            st.rerun()
+
+    with f_col2:
+        st.markdown("<div style='height: 28px;'></div>", unsafe_allow_html=True)
+        if st.button("Reset Filter", use_container_width=True):
+            st.session_state["active_filter"] = "Original"
+            st.rerun()
+
+    # 3. Dynamic Filter Parameters (Immediate real-time feedback)
+    with st.expander(f"Adjust Parameters: {active_filter}", expanded=True):
+        params = render_parameter_controls(active_filter)
+
+    # Synchronize live thread holder for instantaneous WebRTC update
+    LiveFilterHolder.set(active_filter, params)
+
+    st.markdown("<hr style='margin: 14px 0; opacity: 0.15;'>", unsafe_allow_html=True)
 
     # =========================================================================
-    # TAB 1: IMAGE STUDIO (Original Image | Processed Image Side-by-Side)
+    # VIEW A: LIVE CAMERA STREAM VIEW
     # =========================================================================
-    with tab_image_studio:
-        # Input Controls Bar
-        with st.expander("Input Source & Image Selection", expanded=False):
-            c_src1, c_src2, c_src3 = st.columns([2, 2, 1])
-            with c_src1:
-                uploaded = st.file_uploader(
-                    "Upload Image (JPG, PNG, WEBP):",
-                    type=["jpg", "jpeg", "png", "webp", "bmp"],
-                )
-                if uploaded is not None:
-                    try:
-                        st.session_state["current_image"] = utils.load_image(uploaded)
-                    except Exception as e:
-                        st.error(f"Error loading image: {e}")
+    if is_live:
+        st.markdown(
+            f"""
+            <div class="panel-header" style="border-radius: 8px;">
+                <span class="panel-label">Live Camera Viewport</span>
+                <span class="panel-status">Active Filter: {active_filter}</span>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
 
-            with c_src2:
-                sample_options = {
-                    "Portrait Demo (AI Background)": "portrait.jpg",
-                    "Landscape Demo (Textures & Edges)": "landscape.jpg",
-                }
-                chosen_sample = st.selectbox("Or Choose Preset Sample:", list(sample_options.keys()))
-                if st.button("Load Selected Sample", use_container_width=True):
-                    path = os.path.join(os.path.dirname(__file__), "assets", sample_options[chosen_sample])
-                    if os.path.exists(path):
-                        st.session_state["current_image"] = utils.load_image(path)
-                        st.rerun()
+        st.markdown("<div style='font-size: 0.85rem; color: #94a3b8; margin-top: 6px; margin-bottom: 10px;'>Click <b>START</b> below to begin streaming. As you click any filter above or adjust sliders, the video feed updates immediately in real time!</div>", unsafe_allow_html=True)
 
-            with c_src3:
-                snap = st.camera_input("Quick Camera Snapshot")
-                if snap is not None:
-                    try:
-                        st.session_state["current_image"] = utils.load_image(snap)
-                    except Exception as e:
-                        st.error(f"Snapshot error: {e}")
-
-        # Active Image Reference
-        input_img = st.session_state["current_image"]
-        active_filter = st.session_state["active_filter"]
-
-        # 1. Filter Thumbnails Quick-Bar
-        render_filter_thumbnails_bar(input_img, active_filter)
-
-        # 2. Filter Dropdown for All 18 Filters
-        all_col1, all_col2 = st.columns([3, 1])
-        with all_col1:
-            selected_from_menu = st.selectbox(
-                "Filter Selection:",
-                FILTER_NAMES,
-                index=FILTER_NAMES.index(active_filter) if active_filter in FILTER_NAMES else 0,
-                key="filter_menu_select",
+        if HAS_WEBRTC:
+            webrtc_streamer(
+                key="studio-live-stream-streamer",
+                video_frame_callback=webrtc_video_frame_callback,
+                rtc_configuration=RTC_CONFIGURATION,
+                media_stream_constraints={"video": {"width": {"ideal": 640}, "height": {"ideal": 480}}, "audio": False},
+                async_processing=True,
             )
-            if selected_from_menu != active_filter:
-                st.session_state["active_filter"] = selected_from_menu
-                st.rerun()
+        else:
+            st.error("WebRTC streaming module is not available in the current environment.")
 
-        with all_col2:
-            st.markdown("<div style='height: 28px;'></div>", unsafe_allow_html=True)
-            if st.button("Reset to Original", use_container_width=True):
-                st.session_state["active_filter"] = "Original"
-                st.rerun()
-
-        # 3. Dynamic Parameter Controls
-        with st.expander(f"Adjust Parameters: {active_filter}", expanded=True):
-            params = render_parameter_controls(active_filter)
-
-        # Sync thread-safe holder for WebRTC
-        LiveFilterHolder.set(active_filter, params)
-
-        # 4. Process the Active Image
+    # =========================================================================
+    # VIEW B: PHOTO STUDIO (Original Image | Processed Image Side-by-Side)
+    # =========================================================================
+    else:
         # Scale for optimal real-time responsiveness if exceeds 1080p
         scaled_input = utils.resize_image_max_dim(input_img, max_dim=1080)
         h, w = scaled_input.shape[:2]
 
         processed_result, latency_ms, fps = apply_filter_pipeline(scaled_input, active_filter, params)
         is_rgba = (processed_result.ndim == 3 and processed_result.shape[2] == 4)
-
-        # 5. Core View: ORIGINAL IMAGE | PROCESSED IMAGE (50/50 Dual Display)
-        st.markdown("<hr style='margin: 16px 0; opacity: 0.15;'>", unsafe_allow_html=True)
 
         col_left, col_right = st.columns(2)
 
@@ -898,32 +789,39 @@ def main():
                 use_container_width=True,
             )
 
-    # =========================================================================
-    # TAB 2: LIVE CAMERA STREAM (Browser WebRTC)
-    # =========================================================================
-    with tab_live_camera:
-        st.markdown(
-            f"""
-            <div class="panel-header" style="margin-bottom: 12px; border-radius: 8px;">
-                <span class="panel-label">Real-Time Browser Camera Stream</span>
-                <span class="panel-status">Active Filter: {active_filter}</span>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
+        # Source Selection Drawer (Upload / Presets / Snapshot)
+        with st.expander("Change Image / Upload Custom Photo", expanded=False):
+            c_src1, c_src2, c_src3 = st.columns([2, 2, 1])
+            with c_src1:
+                uploaded = st.file_uploader(
+                    "Upload Image (JPG, PNG, WEBP):",
+                    type=["jpg", "jpeg", "png", "webp", "bmp"],
+                )
+                if uploaded is not None:
+                    try:
+                        st.session_state["current_image"] = utils.load_image(uploaded)
+                    except Exception as e:
+                        st.error(f"Error loading image: {e}")
 
-        st.markdown("Click **START** below and allow camera permissions in your browser. Video is processed frame-by-frame using the active filter.")
+            with c_src2:
+                sample_options = {
+                    "Portrait Demo (AI Background)": "portrait.jpg",
+                    "Landscape Demo (Textures & Edges)": "landscape.jpg",
+                }
+                chosen_sample = st.selectbox("Or Choose Preset Sample:", list(sample_options.keys()))
+                if st.button("Load Selected Sample", use_container_width=True):
+                    path = os.path.join(os.path.dirname(__file__), "assets", sample_options[chosen_sample])
+                    if os.path.exists(path):
+                        st.session_state["current_image"] = utils.load_image(path)
+                        st.rerun()
 
-        if HAS_WEBRTC:
-            webrtc_streamer(
-                key="studio-live-stream-streamer",
-                video_frame_callback=webrtc_video_frame_callback,
-                rtc_configuration=RTC_CONFIGURATION,
-                media_stream_constraints={"video": {"width": {"ideal": 640}, "height": {"ideal": 480}}, "audio": False},
-                async_processing=True,
-            )
-        else:
-            st.error("WebRTC streaming module is not available in the current environment.")
+            with c_src3:
+                snap = st.camera_input("Snapshot")
+                if snap is not None:
+                    try:
+                        st.session_state["current_image"] = utils.load_image(snap)
+                    except Exception as e:
+                        st.error(f"Snapshot error: {e}")
 
 
 if __name__ == "__main__":
