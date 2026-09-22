@@ -2,8 +2,8 @@
 Real Time Computer Vision Filter Studio
 Built by Bilal Butt
 
-A modern, user-friendly, high-performance Computer Vision studio.
-Accessible to everyone — from complete beginners to CV professionals!
+High-performance, interactive image and video processing application.
+Engineered with OpenCV, NumPy, PyTorch LRASPP MobileNet, and Streamlit.
 """
 
 import time
@@ -43,7 +43,7 @@ class LiveFilterHolder:
             return cls._filter_name, cls._params
 
 
-# Google STUN servers for NAT/firewall traversal on Streamlit Cloud
+# STUN servers for NAT traversal on remote hosts
 RTC_CONFIGURATION = (
     RTCConfiguration(
         {
@@ -58,15 +58,14 @@ RTC_CONFIGURATION = (
     else None
 )
 
-# --- Page Configuration ---
+# --- Page Configuration (No emojis) ---
 st.set_page_config(
-    page_title="Filter Studio | Bilal Butt",
-    page_icon="✨",
+    page_title="Real Time CV Filter Studio - Bilal Butt",
     layout="wide",
-    initial_sidebar_state="expanded",
+    initial_sidebar_state="collapsed",
 )
 
-# --- Custom Styling with Google Fonts & Polished Glassmorphism ---
+# --- Clean Professional Dark Studio Styling ---
 st.markdown(
     """
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -74,158 +73,223 @@ st.markdown(
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
 
     <style>
-    /* Global font & typography */
+    /* Global Reset & Typography */
     html, body, [class*="css"] {
         font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif !important;
+        background-color: #0b0f19 !important;
+        color: #f1f5f9 !important;
     }
 
-    /* Headings */
-    h1, h2, h3, .main-title {
-        font-family: 'Space Grotesk', 'Plus Jakarta Sans', sans-serif !important;
-        letter-spacing: -0.02em;
+    /* Container Spacing */
+    .block-container {
+        padding-top: 1.5rem !important;
+        padding-bottom: 2rem !important;
+        max-width: 1360px !important;
     }
 
-    .main-title {
-        font-size: 2.5rem;
-        font-weight: 800;
-        background: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #f472b6 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        margin-bottom: 0.1rem;
-    }
-
-    .author-pill {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        background: linear-gradient(90deg, rgba(56, 189, 248, 0.15), rgba(129, 140, 248, 0.15));
-        border: 1px solid rgba(56, 189, 248, 0.4);
-        padding: 4px 14px;
-        border-radius: 9999px;
-        font-size: 0.85rem;
-        font-weight: 700;
-        color: #38bdf8;
-        box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
-        margin-bottom: 0.8rem;
-    }
-
-    .lead-text {
-        font-size: 1.05rem;
-        color: #94a3b8;
-        margin-bottom: 1.5rem;
-        line-height: 1.5;
-    }
-
-    /* Step helper box */
-    .step-box {
-        background: rgba(15, 23, 42, 0.65);
-        border: 1px solid rgba(148, 163, 184, 0.18);
-        border-radius: 14px;
-        padding: 0.85rem 1.25rem;
-        margin-bottom: 1.2rem;
+    /* Header Styling */
+    .studio-header {
         display: flex;
-        align-items: center;
         justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #1e293b;
+        padding-bottom: 1rem;
+        margin-bottom: 1.25rem;
         flex-wrap: wrap;
-        gap: 10px;
+        gap: 12px;
     }
-    .step-pill {
+    .studio-title {
+        font-family: 'Space Grotesk', sans-serif !important;
+        font-size: 1.85rem;
         font-weight: 700;
+        letter-spacing: -0.02em;
+        color: #f8fafc;
+        margin: 0;
+    }
+    .studio-subtitle {
         font-size: 0.9rem;
-        color: #e2e8f0;
+        color: #94a3b8;
+        margin-top: 2px;
+    }
+    .author-badge {
+        font-size: 0.8rem;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: #38bdf8;
+        background: rgba(56, 189, 248, 0.08);
+        border: 1px solid rgba(56, 189, 248, 0.3);
+        padding: 6px 14px;
+        border-radius: 6px;
     }
 
-    /* Metric Cards */
-    .metric-card {
-        background: rgba(30, 41, 59, 0.65);
-        backdrop-filter: blur(12px);
-        border: 1px solid rgba(148, 163, 184, 0.15);
-        border-radius: 14px;
-        padding: 0.85rem 1rem;
-        text-align: center;
-        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
-        transition: transform 0.2s ease, border-color 0.2s ease;
+    /* Stage Panel & Labels */
+    .panel-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #111827;
+        border: 1px solid #1f2937;
+        border-bottom: none;
+        border-radius: 8px 8px 0 0;
+        padding: 8px 14px;
     }
-    .metric-card:hover {
-        border-color: rgba(56, 189, 248, 0.4);
-        transform: translateY(-2px);
-    }
-    .metric-val {
-        font-size: 1.5rem;
-        font-weight: 800;
-        color: #f8fafc;
-        font-family: 'Space Grotesk', sans-serif;
-    }
-    .metric-lbl {
+    .panel-label {
         font-size: 0.78rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
         color: #94a3b8;
+    }
+    .panel-status {
+        font-size: 0.72rem;
+        font-weight: 600;
+        color: #38bdf8;
+        background: rgba(56, 189, 248, 0.12);
+        padding: 2px 8px;
+        border-radius: 4px;
+    }
+
+    /* Image Wrapper */
+    .image-frame {
+        border: 1px solid #1f2937;
+        border-radius: 0 0 8px 8px;
+        background: #030712;
+        overflow: hidden;
+        margin-bottom: 0.75rem;
+    }
+
+    /* Performance Metric Cards */
+    .metric-row {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+        margin-top: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    .metric-box {
+        background: #111827;
+        border: 1px solid #1f2937;
+        border-radius: 8px;
+        padding: 10px;
+        text-align: center;
+    }
+    .metric-number {
+        font-family: 'Space Grotesk', monospace;
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #f8fafc;
+    }
+    .metric-title {
+        font-size: 0.72rem;
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.05em;
+        color: #64748b;
         margin-top: 2px;
     }
 
-    /* Description pill */
-    .filter-desc-box {
-        background: linear-gradient(90deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.8));
-        border-left: 4px solid #818cf8;
-        border-radius: 0 10px 10px 0;
-        padding: 0.75rem 1.25rem;
-        margin-bottom: 1.2rem;
-        color: #cbd5e1;
-        font-size: 0.95rem;
+    /* Filter Cards & Thumbnails */
+    .filter-card {
+        border: 1px solid #1e293b;
+        border-radius: 8px;
+        background: #0f172a;
+        padding: 6px;
+        text-align: center;
+        transition: all 0.2s ease;
+        margin-bottom: 8px;
+    }
+    .filter-card:hover {
+        border-color: #38bdf8;
+        transform: translateY(-2px);
+    }
+    .filter-card.active {
+        border: 2px solid #38bdf8 !important;
+        background: rgba(56, 189, 248, 0.1) !important;
+        box-shadow: 0 0 12px rgba(56, 189, 248, 0.25);
+    }
+    .filter-title {
+        font-size: 0.76rem;
+        font-weight: 700;
+        color: #e2e8f0;
+        margin-top: 4px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
     }
 
-    /* Big Friendly Buttons */
+    /* Control Box */
+    .controls-container {
+        background: #111827;
+        border: 1px solid #1f2937;
+        border-radius: 8px;
+        padding: 16px 20px;
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    /* Action Buttons */
     div.stButton > button {
-        border-radius: 12px !important;
-        font-weight: 700 !important;
-        padding: 0.55rem 1.25rem !important;
-        font-size: 0.95rem !important;
-        transition: all 0.2s ease !important;
+        border-radius: 6px !important;
+        font-weight: 600 !important;
+        font-size: 0.85rem !important;
+        border: 1px solid #334155 !important;
+        background: #1e293b !important;
+        color: #f1f5f9 !important;
+        transition: all 0.15s ease !important;
+        padding: 6px 14px !important;
     }
     div.stButton > button:hover {
-        transform: translateY(-1px) !important;
-        box-shadow: 0 6px 18px rgba(56, 189, 248, 0.25) !important;
+        background: #2563eb !important;
+        border-color: #3b82f6 !important;
+        color: #ffffff !important;
     }
 
-    /* Primary Download Button */
-    .stDownloadButton button {
-        background: linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%) !important;
-        color: white !important;
+    /* Active Filter Button Highlight */
+    .active-filter-btn button {
+        background: #2563eb !important;
+        border-color: #60a5fa !important;
+        color: #ffffff !important;
         font-weight: 700 !important;
-        font-size: 1.05rem !important;
-        border: none !important;
-        border-radius: 14px !important;
-        padding: 0.75rem 2rem !important;
-        box-shadow: 0 6px 20px rgba(99, 102, 241, 0.35) !important;
-        transition: all 0.25s ease !important;
-    }
-    .stDownloadButton button:hover {
-        transform: translateY(-2px) !important;
-        box-shadow: 0 8px 25px rgba(99, 102, 241, 0.5) !important;
-        opacity: 0.96;
+        box-shadow: 0 0 10px rgba(37, 99, 235, 0.4) !important;
     }
 
-    /* Streamlit tabs */
-    .stTabs [data-baseweb="tab-list"] {
-        gap: 12px;
-        background: rgba(15, 23, 42, 0.5);
-        padding: 6px;
-        border-radius: 14px;
-        border: 1px solid rgba(148, 163, 184, 0.15);
-    }
-    .stTabs [data-baseweb="tab"] {
-        border-radius: 10px !important;
-        padding: 8px 20px !important;
+    /* Download Button */
+    .stDownloadButton button {
+        background: #0284c7 !important;
+        color: #ffffff !important;
         font-weight: 700 !important;
         font-size: 0.95rem !important;
+        border: 1px solid #0369a1 !important;
+        border-radius: 6px !important;
+        padding: 10px 24px !important;
+        width: 100% !important;
+        transition: all 0.2s ease !important;
+    }
+    .stDownloadButton button:hover {
+        background: #0369a1 !important;
+        box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35) !important;
+    }
+
+    /* Tabs Styling */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 8px;
+        background: #111827;
+        padding: 4px;
+        border-radius: 8px;
+        border: 1px solid #1f2937;
+        margin-bottom: 1rem;
+    }
+    .stTabs [data-baseweb="tab"] {
+        border-radius: 6px !important;
+        padding: 6px 18px !important;
+        font-weight: 600 !important;
+        font-size: 0.88rem !important;
         color: #94a3b8 !important;
+        border: none !important;
     }
     .stTabs [aria-selected="true"] {
-        background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(129, 140, 248, 0.2)) !important;
+        background: #1e293b !important;
         color: #38bdf8 !important;
-        border-bottom: 2px solid #38bdf8 !important;
     }
     </style>
     """,
@@ -233,129 +297,130 @@ st.markdown(
 )
 
 
+# Filter definitions with short technical description
+FILTERS_CATALOG = [
+    {
+        "id": "Original",
+        "name": "Original",
+        "desc": "Unprocessed reference source input.",
+    },
+    {
+        "id": "Grayscale",
+        "name": "Grayscale",
+        "desc": "Rec. 601 single-channel luminance conversion.",
+    },
+    {
+        "id": "Gaussian Blur",
+        "name": "Gaussian Blur",
+        "desc": "2D Gaussian kernel low-pass spatial smoothing.",
+    },
+    {
+        "id": "Median Blur",
+        "name": "Median Blur",
+        "desc": "Non-linear filter removing impulse and salt-pepper noise.",
+    },
+    {
+        "id": "Sharpen",
+        "name": "Sharpen",
+        "desc": "High-frequency unsharp masking enhancement.",
+    },
+    {
+        "id": "Edge Detection",
+        "name": "Edge Detection",
+        "desc": "Spatial gradient edge detection via Sobel / Laplacian.",
+    },
+    {
+        "id": "Canny Edge Detection",
+        "name": "Canny Edge",
+        "desc": "Multi-stage optimal hysteresis edge detector.",
+    },
+    {
+        "id": "Threshold",
+        "name": "Threshold",
+        "desc": "Intensity segmentation (Binary or automated Otsu).",
+    },
+    {
+        "id": "Adaptive Threshold",
+        "name": "Adaptive Thresh",
+        "desc": "Local neighborhood adaptive thresholding.",
+    },
+    {
+        "id": "Brightness",
+        "name": "Brightness",
+        "desc": "Linear luminance offset across color channels.",
+    },
+    {
+        "id": "Contrast",
+        "name": "Contrast",
+        "desc": "Luminance scaling and dynamic range multiplier.",
+    },
+    {
+        "id": "Saturation",
+        "name": "Saturation",
+        "desc": "HSV color space chromatic intensity scale.",
+    },
+    {
+        "id": "Negative",
+        "name": "Negative",
+        "desc": "Bitwise inversion of color intensity channels.",
+    },
+    {
+        "id": "Sepia",
+        "name": "Sepia",
+        "desc": "Three-channel photographic warm sepia matrix transform.",
+    },
+    {
+        "id": "Emboss",
+        "name": "Emboss",
+        "desc": "Directional relief convolution matrix with 128 bias.",
+    },
+    {
+        "id": "Cartoon Effect",
+        "name": "Cartoon",
+        "desc": "Edge-preserving bilateral filter with color quantization.",
+    },
+    {
+        "id": "Background Blur",
+        "name": "Background Blur",
+        "desc": "Foreground segmentation with background depth bokeh blur.",
+    },
+    {
+        "id": "Background Removal",
+        "name": "Background Removal",
+        "desc": "Alpha extraction producing clean transparent PNG cutout.",
+    },
+]
+
+FILTER_NAMES = [f["id"] for f in FILTERS_CATALOG]
+
+
 @st.cache_resource
-def load_cached_segmentation_model():
-    """Caches the PyTorch LRASPP segmentation model in memory."""
+def load_segmentation_model():
+    """Initializes segmentation model in memory."""
     try:
         return background.get_segmentation_model()
     except Exception:
         return None
 
 
-# Pre-warm model cache silently
-_ = load_cached_segmentation_model()
-
-# Dictionary of friendly explanations for all filters
-FILTER_INFO = {
-    "Original": {
-        "icon": "📷",
-        "title": "Original Photo",
-        "desc": "Shows your natural photo or video stream without any changes.",
-    },
-    "Cartoon Effect": {
-        "icon": "🎨",
-        "title": "Cartoon / Anime Style",
-        "desc": "Flattens colors and draws bold outline edges like a colorful animated movie!",
-    },
-    "Background Blur": {
-        "icon": "🌫️",
-        "title": "DSLR Portrait Bokeh",
-        "desc": "Keeps you crystal sharp while beautifully blurring the background like a professional camera lens.",
-    },
-    "Background Removal": {
-        "icon": "✂️",
-        "title": "Transparent Cutout Sticker",
-        "desc": "Removes the background completely so you can save as a transparent PNG or put yourself in a clean photo studio.",
-    },
-    "Grayscale": {
-        "icon": "🖤",
-        "title": "Classic Black & White",
-        "desc": "Converts color into timeless monochrome studio photography.",
-    },
-    "Sharpen": {
-        "icon": "🗡️",
-        "title": "Ultra Crisp Sharpen",
-        "desc": "Enhances fine details, hair, and edges for maximum punch and crispness.",
-    },
-    "Canny Edge Detection": {
-        "icon": "✏️",
-        "title": "Pencil Line Sketch",
-        "desc": "Extracts the key contours and outlines like an artist's pencil drawing.",
-    },
-    "Edge Detection": {
-        "icon": "⚡",
-        "title": "Neon Contour Glow",
-        "desc": "Calculates directional gradients (Sobel / Laplacian) across every boundary.",
-    },
-    "Gaussian Blur": {
-        "icon": "💨",
-        "title": "Smooth Gaussian Softener",
-        "desc": "Softens the entire image to smooth skin or create a dreamy atmosphere.",
-    },
-    "Median Blur": {
-        "icon": "🫧",
-        "title": "Noise Cleaning Blur",
-        "desc": "Specialized filter that eliminates grain and speckles while preserving sharp outlines.",
-    },
-    "Brightness": {
-        "icon": "☀️",
-        "title": "Sunlight Brightness",
-        "desc": "Easily lightens or dims your photo to fix dark or overexposed lighting.",
-    },
-    "Contrast": {
-        "icon": "🌗",
-        "title": "Punchy Contrast",
-        "desc": "Deepens shadows and elevates highlights for a cinematic, dramatic punch.",
-    },
-    "Saturation": {
-        "icon": "🌈",
-        "title": "Vibrant Color Boost",
-        "desc": "Amplifies color richness from gentle pastels to vivid, punchy pop-art.",
-    },
-    "Negative": {
-        "icon": "🔄",
-        "title": "X-Ray Negative",
-        "desc": "Inverts all colors for an eerie sci-fi film negative effect.",
-    },
-    "Sepia": {
-        "icon": "📜",
-        "title": "1970s Vintage Retro",
-        "desc": "Applies a warm, nostalgic antique tone like a precious historic photograph.",
-    },
-    "Emboss": {
-        "icon": "🗿",
-        "title": "3D Carved Metal",
-        "desc": "Transforms your image into an embossed 3D stone or metallic engraving.",
-    },
-    "Threshold": {
-        "icon": "🏁",
-        "title": "High-Contrast Binary",
-        "desc": "Forces every pixel to either pure black or pure white (stamp / stencil look).",
-    },
-    "Adaptive Threshold": {
-        "icon": "📑",
-        "title": "Document Scanner",
-        "desc": "Compensates for uneven shadows, perfect for text, document scanning, and comic inks.",
-    },
-}
-
-ALL_FILTER_NAMES = list(FILTER_INFO.keys())
+# Pre-warm model in background
+_ = load_segmentation_model()
 
 
-def get_available_presets():
-    """Returns sample preset images."""
-    presets = {}
-    sample_dir = os.path.join(os.path.dirname(__file__), "assets")
-    if os.path.exists(os.path.join(sample_dir, "portrait.jpg")):
-        presets["👤 Portrait Model (AI Background Demo)"] = os.path.join(sample_dir, "portrait.jpg")
-    if os.path.exists(os.path.join(sample_dir, "landscape.jpg")):
-        presets["🌄 Scenic Landscape (Colors & Edges Demo)"] = os.path.join(sample_dir, "landscape.jpg")
-    return presets
+def get_default_image() -> np.ndarray:
+    """Loads default reference portrait image from assets."""
+    path = os.path.join(os.path.dirname(__file__), "assets", "portrait.jpg")
+    if os.path.exists(path):
+        return utils.load_image(path)
+    # Synthetic fallback
+    synth = np.zeros((480, 640, 3), dtype=np.uint8)
+    cv2.circle(synth, (320, 240), 120, (200, 180, 160), -1)
+    return synth
 
 
-def process_image(image_rgb: np.ndarray, filter_name: str, params: dict):
-    """Applies filter and computes execution duration and FPS."""
-    t_start = time.perf_counter()
+def apply_filter_pipeline(image_rgb: np.ndarray, filter_name: str, params: dict):
+    """Executes filter and tracks runtime latency and FPS."""
+    t0 = time.perf_counter()
 
     if filter_name == "Original":
         processed = filters.apply_original(image_rgb)
@@ -434,7 +499,7 @@ def process_image(image_rgb: np.ndarray, filter_name: str, params: dict):
     elif filter_name == "Cartoon Effect":
         processed = filters.apply_cartoon(
             image_rgb,
-            num_bilateral=params.get("num_bilateral", 3),
+            num_bilateral=params.get("num_bilateral", 2),
             num_colors=params.get("num_colors", 8),
             edge_kernel=params.get("edge_kernel", 7),
         )
@@ -458,25 +523,25 @@ def process_image(image_rgb: np.ndarray, filter_name: str, params: dict):
     else:
         processed = image_rgb.copy()
 
-    duration_sec = time.perf_counter() - t_start
-    duration_ms = duration_sec * 1000.0
-    fps = (1.0 / duration_sec) if duration_sec > 0 else 0.0
+    elapsed = time.perf_counter() - t0
+    latency_ms = elapsed * 1000.0
+    fps = (1.0 / elapsed) if elapsed > 0 else 0.0
 
-    return processed, duration_ms, fps
+    return processed, latency_ms, fps
 
 
 def webrtc_video_frame_callback(frame: "av.VideoFrame") -> "av.VideoFrame":
-    """Processes live WebRTC webcam frames in real-time."""
+    """Real-time frame processing callback for WebRTC live camera."""
     img_bgr = frame.to_ndarray(format="bgr24")
     img_rgb = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
 
     cur_filter, cur_params = LiveFilterHolder.get()
     try:
-        processed, _, _ = process_image(img_rgb, cur_filter, cur_params)
+        processed, _, _ = apply_filter_pipeline(img_rgb, cur_filter, cur_params)
         if processed.ndim == 3 and processed.shape[2] == 4:
             alpha = processed[:, :, 3:4] / 255.0
             fg = processed[:, :, :3]
-            bg = np.full_like(fg, 25)
+            bg = np.full_like(fg, 20)
             comp = (fg * alpha + bg * (1.0 - alpha)).astype(np.uint8)
             out_bgr = cv2.cvtColor(comp, cv2.COLOR_RGB2BGR)
         else:
@@ -487,389 +552,378 @@ def webrtc_video_frame_callback(frame: "av.VideoFrame") -> "av.VideoFrame":
     return av.VideoFrame.from_ndarray(out_bgr, format="bgr24")
 
 
-def render_sidebar():
-    """Renders user-friendly sidebar controls."""
-    if "selected_filter" not in st.session_state:
-        st.session_state["selected_filter"] = "Cartoon Effect"
+def render_filter_thumbnails_bar(base_image: np.ndarray, active_filter: str):
+    """
+    Generates miniature previews for the key filters and displays an interactive gallery.
+    Clicking any card selects the filter immediately.
+    """
+    # Downscale to 80px thumbnail for sub-millisecond generation
+    h, w = base_image.shape[:2]
+    thumb_w = 90
+    thumb_h = max(1, int(round(thumb_w * h / w)))
+    thumb = cv2.resize(base_image, (thumb_w, thumb_h), interpolation=cv2.INTER_AREA)
 
-    with st.sidebar:
-        st.markdown("<div class='author-pill'>✨ Built by Bilal Butt</div>", unsafe_allow_html=True)
-        st.markdown("### 🎛️ Filter Selection")
+    # Primary gallery filters to showcase
+    gallery_keys = [
+        ("Original", "Original", lambda img: filters.apply_original(img)),
+        ("Cartoon Effect", "Cartoon", lambda img: filters.apply_cartoon(img, 1, 8, 5)),
+        ("Background Blur", "BG Blur", lambda img: filters.apply_background_blur(img, 25, 3, 0.4, False)),
+        ("Background Removal", "Cutout", lambda img: background.apply_background_removal(img, "Studio Grey", (200, 200, 200), 3, 0.4, False)),
+        ("Grayscale", "Grayscale", lambda img: filters.apply_grayscale(img)),
+        ("Sharpen", "Sharpen", lambda img: filters.apply_sharpen(img, 2.0)),
+        ("Canny Edge Detection", "Canny", lambda img: filters.apply_canny(img, 50, 150)),
+        ("Sepia", "Sepia", lambda img: filters.apply_sepia(img, 1.0)),
+        ("Emboss", "Emboss", lambda img: filters.apply_emboss(img, 1.2)),
+        ("Threshold", "Threshold", lambda img: filters.apply_threshold(img, 127)),
+    ]
 
-        # Friendly quick-selection buttons
-        st.markdown("**⭐ Popular Filters (Click to Apply):**")
-        qcol1, qcol2 = st.columns(2)
-        with qcol1:
-            if st.button("🎨 Cartoon", use_container_width=True):
-                st.session_state["selected_filter"] = "Cartoon Effect"
-            if st.button("🌫️ Blur BG", use_container_width=True):
-                st.session_state["selected_filter"] = "Background Blur"
-            if st.button("🖤 B & W", use_container_width=True):
-                st.session_state["selected_filter"] = "Grayscale"
-            if st.button("☀️ Brighten", use_container_width=True):
-                st.session_state["selected_filter"] = "Brightness"
-        with qcol2:
-            if st.button("✂️ Cutout", use_container_width=True):
-                st.session_state["selected_filter"] = "Background Removal"
-            if st.button("✏️ Sketch", use_container_width=True):
-                st.session_state["selected_filter"] = "Canny Edge Detection"
-            if st.button("📜 Vintage", use_container_width=True):
-                st.session_state["selected_filter"] = "Sepia"
-            if st.button("📷 Original", use_container_width=True):
-                st.session_state["selected_filter"] = "Original"
+    st.markdown("<div style='font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; margin-bottom: 8px;'>Filter Previews (Click to apply)</div>", unsafe_allow_html=True)
+    
+    cols = st.columns(len(gallery_keys))
+    for i, (f_id, f_label, f_fn) in enumerate(gallery_keys):
+        with cols[i]:
+            try:
+                t_proc = f_fn(thumb)
+            except Exception:
+                t_proc = thumb
 
-        st.markdown("<hr style='margin: 12px 0; opacity: 0.2;'>", unsafe_allow_html=True)
+            is_active = (active_filter == f_id)
+            active_class = "active" if is_active else ""
+            status_text = "[ACTIVE]" if is_active else ""
 
-        # Full Filter Dropdown for all 18
-        current_index = (
-            ALL_FILTER_NAMES.index(st.session_state["selected_filter"])
-            if st.session_state["selected_filter"] in ALL_FILTER_NAMES
-            else 0
-        )
-        selected_filter = st.selectbox(
-            "📋 Or Choose From All 18 Filters:",
-            ALL_FILTER_NAMES,
-            index=current_index,
-            key="filter_dropdown",
-        )
-        st.session_state["selected_filter"] = selected_filter
+            # Card image
+            st.image(t_proc, use_container_width=True)
+            
+            # Clickable button with active state styling
+            btn_label = f"{f_label} *" if is_active else f_label
+            if st.button(btn_label, key=f"thumb_btn_{f_id}", use_container_width=True):
+                st.session_state["active_filter"] = f_id
+                st.rerun()
 
-        # Dynamic Sliders with friendly descriptions
-        st.markdown(f"#### ⚙️ Adjust: *{selected_filter}*")
-        params = {}
 
-        if selected_filter == "Cartoon Effect":
-            params["num_bilateral"] = st.slider("Smoothness (Drawing feel)", 1, 6, 3, step=1)
-            params["num_colors"] = st.slider("Color Levels (Anime palette)", 4, 32, 8, step=2)
+def render_parameter_controls(active_filter: str) -> dict:
+    """Renders parameter sliders and controls for the active filter."""
+    params = {}
+
+    st.markdown(f"<div style='font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #38bdf8; margin-bottom: 10px;'>Parameter Controls: {active_filter}</div>", unsafe_allow_html=True)
+
+    if active_filter == "Cartoon Effect":
+        c1, c2, c3 = st.columns(3)
+        with c1:
+            params["num_bilateral"] = st.slider("Bilateral Passes (Smoothing)", 1, 5, 2, step=1)
+        with c2:
+            params["num_colors"] = st.slider("Color Quantization (Levels)", 4, 32, 8, step=2)
+        with c3:
             params["edge_kernel"] = st.slider("Outline Thickness", 3, 15, 7, step=2)
 
-        elif selected_filter == "Background Blur":
-            params["blur_strength"] = st.slider("Background Softness", 5, 75, 35, step=2)
-            params["feather"] = st.slider("Edge Blending Smoothness", 1, 15, 5, step=1)
-            params["threshold"] = st.slider("Person Detection Sensitivity", 0.1, 0.9, 0.4, step=0.05)
-            params["use_ai"] = st.checkbox("AI High-Quality Mode", value=True)
+    elif active_filter == "Background Blur":
+        c1, c2, c3 = st.columns(3)
+        with c1:
+            params["blur_strength"] = st.slider("Background Blur Radius", 5, 75, 35, step=2)
+        with c2:
+            params["feather"] = st.slider("Edge Feather Radius", 1, 15, 5, step=1)
+        with c3:
+            params["threshold"] = st.slider("Detection Threshold", 0.1, 0.9, 0.4, step=0.05)
+            params["use_ai"] = st.checkbox("AI LRASPP Segmentation", value=True)
 
-        elif selected_filter == "Background Removal":
+    elif active_filter == "Background Removal":
+        c1, c2, c3 = st.columns(3)
+        with c1:
             params["background_type"] = st.selectbox(
-                "Backdrop:",
+                "Replacement Background:",
                 ["Transparent (PNG)", "White", "Black", "Studio Grey", "Custom Color"],
             )
             if params["background_type"] == "Custom Color":
-                col = st.color_picker("Pick Backdrop Color", "#38BDF8")
-                r, g, b = int(col[1:3], 16), int(col[3:5], 16), int(col[5:7], 16)
-                params["custom_color"] = (r, g, b)
+                col = st.color_picker("Color Value", "#38BDF8")
+                params["custom_color"] = (int(col[1:3], 16), int(col[3:5], 16), int(col[5:7], 16))
             else:
                 params["custom_color"] = (255, 255, 255)
-            params["feather"] = st.slider("Edge Smoothing", 1, 15, 5, step=1)
-            params["threshold"] = st.slider("Detection Sensitivity", 0.1, 0.9, 0.4, step=0.05)
-            params["use_ai"] = st.checkbox("AI High-Quality Mode", value=True)
+        with c2:
+            params["feather"] = st.slider("Edge Feather Radius", 1, 15, 5, step=1)
+        with c3:
+            params["threshold"] = st.slider("Detection Threshold", 0.1, 0.9, 0.4, step=0.05)
+            params["use_ai"] = st.checkbox("AI LRASPP Segmentation", value=True)
 
-        elif selected_filter == "Sharpen":
-            params["strength"] = st.slider("Detail Crispness", 0.1, 4.0, 1.5, step=0.1)
+    elif active_filter == "Sharpen":
+        params["strength"] = st.slider("Sharpening Strength", 0.1, 4.0, 1.5, step=0.1)
 
-        elif selected_filter == "Brightness":
-            params["brightness"] = st.slider("Light Level", -100, 100, 30, step=5)
+    elif active_filter == "Gaussian Blur":
+        c1, c2 = st.columns(2)
+        with c1:
+            params["kernel_size"] = st.slider("Kernel Size (Odd)", 3, 51, 15, step=2)
+        with c2:
+            params["sigma"] = st.slider("Sigma (Dispersion)", 0.0, 10.0, 0.0, step=0.5)
 
-        elif selected_filter == "Contrast":
-            params["contrast"] = st.slider("Punch & Shadows", 0.1, 3.0, 1.5, step=0.1)
+    elif active_filter == "Median Blur":
+        params["kernel_size"] = st.slider("Kernel Size (Odd)", 3, 45, 11, step=2)
 
-        elif selected_filter == "Saturation":
-            params["saturation"] = st.slider("Color Vibrance", 0.0, 3.0, 1.5, step=0.1)
+    elif active_filter == "Brightness":
+        params["brightness"] = st.slider("Brightness Offset", -100, 100, 30, step=5)
 
-        elif selected_filter == "Sepia":
-            params["intensity"] = st.slider("Vintage Warmth", 0.0, 1.0, 1.0, step=0.05)
+    elif active_filter == "Contrast":
+        params["contrast"] = st.slider("Contrast Factor", 0.1, 3.0, 1.5, step=0.1)
 
-        elif selected_filter == "Gaussian Blur":
-            params["kernel_size"] = st.slider("Blur Amount", 3, 51, 15, step=2)
-            params["sigma"] = st.slider("Blur Dispersion", 0.0, 10.0, 0.0, step=0.5)
+    elif active_filter == "Saturation":
+        params["saturation"] = st.slider("Saturation Multiplier", 0.0, 3.0, 1.5, step=0.1)
 
-        elif selected_filter == "Median Blur":
-            params["kernel_size"] = st.slider("Filter Window Size", 3, 45, 11, step=2)
+    elif active_filter == "Sepia":
+        params["intensity"] = st.slider("Sepia Intensity", 0.0, 1.0, 1.0, step=0.05)
 
-        elif selected_filter == "Canny Edge Detection":
-            params["low_threshold"] = st.slider("Sensitivity (Fine Lines)", 0, 255, 50, step=5)
-            params["high_threshold"] = st.slider("Main Contours", 0, 255, 150, step=5)
+    elif active_filter == "Emboss":
+        params["strength"] = st.slider("Relief Depth", 0.2, 3.0, 1.0, step=0.1)
 
-        elif selected_filter == "Edge Detection":
-            params["method"] = st.selectbox("Style", ["Sobel", "Laplacian", "Prewitt"])
-            params["kernel_size"] = st.slider("Line Width", 1, 7, 3, step=2)
+    elif active_filter == "Canny Edge Detection":
+        c1, c2 = st.columns(2)
+        with c1:
+            params["low_threshold"] = st.slider("Low Hysteresis Threshold", 0, 255, 50, step=5)
+        with c2:
+            params["high_threshold"] = st.slider("High Hysteresis Threshold", 0, 255, 150, step=5)
 
-        elif selected_filter == "Threshold":
-            params["threshold_type"] = st.selectbox("Mode", ["Binary", "Binary Inverted", "Otsu"])
+    elif active_filter == "Edge Detection":
+        c1, c2 = st.columns(2)
+        with c1:
+            params["method"] = st.selectbox("Operator", ["Sobel", "Laplacian", "Prewitt"])
+        with c2:
+            params["kernel_size"] = st.slider("Kernel Size", 1, 7, 3, step=2)
+
+    elif active_filter == "Threshold":
+        c1, c2 = st.columns(2)
+        with c1:
+            params["threshold_type"] = st.selectbox("Method", ["Binary", "Binary Inverted", "Otsu"])
+        with c2:
             if params["threshold_type"] != "Otsu":
-                params["thresh"] = st.slider("Black / White Cutoff", 0, 255, 127, step=1)
+                params["thresh"] = st.slider("Cutoff Level", 0, 255, 127, step=1)
             else:
                 params["thresh"] = 0
+                st.caption("Otsu algorithm calculates threshold automatically.")
             params["max_val"] = 255
 
-        elif selected_filter == "Adaptive Threshold":
+    elif active_filter == "Adaptive Threshold":
+        c1, c2 = st.columns(2)
+        with c1:
             params["method"] = st.selectbox("Method", ["Gaussian", "Mean"])
-            params["block_size"] = st.slider("Window Size", 3, 51, 11, step=2)
-            params["c_val"] = st.slider("Brightness Compensation", -20, 20, 2, step=1)
+            params["block_size"] = st.slider("Neighborhood Size", 3, 51, 11, step=2)
+        with c2:
+            params["c_val"] = st.slider("Constant C", -20, 20, 2, step=1)
             params["max_val"] = 255
 
-        elif selected_filter == "Emboss":
-            params["strength"] = st.slider("3D Carve Depth", 0.2, 3.0, 1.0, step=0.1)
+    else:
+        st.caption("This filter executes with standardized optimal parameters.")
 
-        else:
-            st.caption("✨ Ready! No sliders needed for this filter.")
-
-        st.markdown("<hr style='margin: 15px 0; opacity: 0.2;'>", unsafe_allow_html=True)
-        st.markdown("#### 📐 Display Settings")
-        comparison_view = st.selectbox(
-            "Comparison View:",
-            ["Side-by-Side (Original vs Filtered)", "Filtered Only", "Before / After Split (50/50)"],
-            index=0,
-        )
-
-        max_dimension = 1080
-
-    # Thread-safe sync for live stream
-    LiveFilterHolder.set(selected_filter, params)
-
-    return {
-        "selected_filter": selected_filter,
-        "params": params,
-        "comparison_view": comparison_view,
-        "max_dimension": max_dimension,
-    }
+    return params
 
 
 def main():
-    config = render_sidebar()
-    selected_filter = config["selected_filter"]
-    params = config["params"]
-    comp_view = config["comparison_view"]
-    max_dim = config["max_dimension"]
+    # Session state initialization
+    if "active_filter" not in st.session_state:
+        st.session_state["active_filter"] = "Cartoon Effect"
 
-    # --- Header Title & Author ---
-    st.markdown("<div class='main-title'>Real Time CV Filter Studio</div>", unsafe_allow_html=True)
-    st.markdown(
-        "<div class='lead-text'>Apply 18 real-time computer vision filters with live webcam streaming, AI background blur, and instant download. <b>Created by Bilal Butt</b>.</div>",
-        unsafe_allow_html=True,
-    )
+    if "current_image" not in st.session_state:
+        st.session_state["current_image"] = get_default_image()
 
-    # Friendly Filter Info Banner
-    info = FILTER_INFO.get(selected_filter, {"icon": "✨", "title": selected_filter, "desc": "Custom filter effect."})
+    # --- Header Bar ---
     st.markdown(
-        f"""
-        <div class='filter-desc-box'>
-            <b>{info['icon']} {info['title']}:</b> {info['desc']}
+        """
+        <div class="studio-header">
+            <div>
+                <h1 class="studio-title">Real Time Computer Vision Filter Studio</h1>
+                <div class="studio-subtitle">Interactive high-performance computer vision image and video processing</div>
+            </div>
+            <div class="author-badge">Built by Bilal Butt</div>
         </div>
         """,
         unsafe_allow_html=True,
     )
 
-    # --- Main Navigation Tabs (Super User-Friendly) ---
-    tab_cam, tab_upload, tab_snapshot, tab_presets = st.tabs([
-        "📹 Live Webcam Stream",
-        "🖼️ Upload Your Photo",
-        "📸 Quick Camera Snapshot",
-        "🎨 Try Demo Photos",
-    ])
+    # Top Tabs
+    tab_image_studio, tab_live_camera = st.tabs(["Image Studio", "Live Camera Stream"])
 
-    # 1. TAB: LIVE WEBCAM STREAM
-    with tab_cam:
-        st.markdown("#### 🔴 Live Browser Video Stream")
-        st.markdown(
-            """
-            <div class='step-box'>
-                <span class='step-pill'>👉 Step 1: Click <b>START</b> below & allow camera access</span>
-                <span class='step-pill'>👉 Step 2: Pick any filter from the sidebar in real time!</span>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
+    # =========================================================================
+    # TAB 1: IMAGE STUDIO (Original Image | Processed Image Side-by-Side)
+    # =========================================================================
+    with tab_image_studio:
+        # Input Controls Bar
+        with st.expander("Input Source & Image Selection", expanded=False):
+            c_src1, c_src2, c_src3 = st.columns([2, 2, 1])
+            with c_src1:
+                uploaded = st.file_uploader(
+                    "Upload Image (JPG, PNG, WEBP):",
+                    type=["jpg", "jpeg", "png", "webp", "bmp"],
+                )
+                if uploaded is not None:
+                    try:
+                        st.session_state["current_image"] = utils.load_image(uploaded)
+                    except Exception as e:
+                        st.error(f"Error loading image: {e}")
 
-        if HAS_WEBRTC:
-            webrtc_streamer(
-                key="cv-studio-live-stream",
-                video_frame_callback=webrtc_video_frame_callback,
-                rtc_configuration=RTC_CONFIGURATION,
-                media_stream_constraints={"video": {"width": {"ideal": 640}, "height": {"ideal": 480}}, "audio": False},
-                async_processing=True,
+            with c_src2:
+                sample_options = {
+                    "Portrait Demo (AI Background)": "portrait.jpg",
+                    "Landscape Demo (Textures & Edges)": "landscape.jpg",
+                }
+                chosen_sample = st.selectbox("Or Choose Preset Sample:", list(sample_options.keys()))
+                if st.button("Load Selected Sample", use_container_width=True):
+                    path = os.path.join(os.path.dirname(__file__), "assets", sample_options[chosen_sample])
+                    if os.path.exists(path):
+                        st.session_state["current_image"] = utils.load_image(path)
+                        st.rerun()
+
+            with c_src3:
+                snap = st.camera_input("Quick Camera Snapshot")
+                if snap is not None:
+                    try:
+                        st.session_state["current_image"] = utils.load_image(snap)
+                    except Exception as e:
+                        st.error(f"Snapshot error: {e}")
+
+        # Active Image Reference
+        input_img = st.session_state["current_image"]
+        active_filter = st.session_state["active_filter"]
+
+        # 1. Filter Thumbnails Quick-Bar
+        render_filter_thumbnails_bar(input_img, active_filter)
+
+        # 2. Filter Dropdown for All 18 Filters
+        all_col1, all_col2 = st.columns([3, 1])
+        with all_col1:
+            selected_from_menu = st.selectbox(
+                "Filter Selection:",
+                FILTER_NAMES,
+                index=FILTER_NAMES.index(active_filter) if active_filter in FILTER_NAMES else 0,
+                key="filter_menu_select",
             )
+            if selected_from_menu != active_filter:
+                st.session_state["active_filter"] = selected_from_menu
+                st.rerun()
+
+        with all_col2:
+            st.markdown("<div style='height: 28px;'></div>", unsafe_allow_html=True)
+            if st.button("Reset to Original", use_container_width=True):
+                st.session_state["active_filter"] = "Original"
+                st.rerun()
+
+        # 3. Dynamic Parameter Controls
+        with st.expander(f"Adjust Parameters: {active_filter}", expanded=True):
+            params = render_parameter_controls(active_filter)
+
+        # Sync thread-safe holder for WebRTC
+        LiveFilterHolder.set(active_filter, params)
+
+        # 4. Process the Active Image
+        # Scale for optimal real-time responsiveness if exceeds 1080p
+        scaled_input = utils.resize_image_max_dim(input_img, max_dim=1080)
+        h, w = scaled_input.shape[:2]
+
+        processed_result, latency_ms, fps = apply_filter_pipeline(scaled_input, active_filter, params)
+        is_rgba = (processed_result.ndim == 3 and processed_result.shape[2] == 4)
+
+        # 5. Core View: ORIGINAL IMAGE | PROCESSED IMAGE (50/50 Dual Display)
+        st.markdown("<hr style='margin: 16px 0; opacity: 0.15;'>", unsafe_allow_html=True)
+
+        col_left, col_right = st.columns(2)
+
+        with col_left:
             st.markdown(
-                f"""
-                <div style="display: flex; gap: 12px; margin-top: 15px; max-width: 640px;">
-                    <div class="metric-card" style="flex: 1;">
-                        <div class="metric-val">{info['icon']} {selected_filter}</div>
-                        <div class="metric-lbl">Active Live Filter</div>
-                    </div>
-                    <div class="metric-card" style="flex: 1;">
-                        <div class="metric-val">30+ FPS</div>
-                        <div class="metric-lbl">Target Frame Rate</div>
-                    </div>
+                """
+                <div class="panel-header">
+                    <span class="panel-label">Original Image</span>
+                    <span class="panel-status">Reference</span>
                 </div>
                 """,
                 unsafe_allow_html=True,
             )
-        else:
-            st.warning("WebRTC package is initializing. You can also use 'Quick Camera Snapshot' in the next tab.")
+            st.markdown("<div class='image-frame'>", unsafe_allow_html=True)
+            st.image(scaled_input, channels="RGB", use_container_width=True)
+            st.markdown("</div>", unsafe_allow_html=True)
 
-    # 2. TAB: UPLOAD PHOTO
-    with tab_upload:
-        st.markdown("#### 📁 Upload an Image from Your Phone or Computer")
-        uploaded_file = st.file_uploader(
-            "Drop your photo here (JPG, PNG, WEBP):",
-            type=["jpg", "jpeg", "png", "webp", "bmp"],
-            label_visibility="collapsed",
-        )
+            st.caption(f"Dimensions: {w} x {h} px | Channels: 3 (RGB)")
 
-        if uploaded_file is not None:
-            try:
-                img_data = utils.load_image(uploaded_file)
-                render_image_processing_view(img_data, selected_filter, params, comp_view, max_dim)
-            except Exception as e:
-                st.error(f"Could not read image: {e}")
-        else:
-            st.info("💡 Click 'Browse files' above to choose a photo, or check the **'Try Demo Photos'** tab!")
-
-    # 3. TAB: QUICK CAMERA SNAPSHOT
-    with tab_snapshot:
-        st.markdown("#### 📸 Take a Photo with Your Camera")
-        cam_snap = st.camera_input("Smile and click 'Take Photo':", label_visibility="collapsed")
-        if cam_snap is not None:
-            try:
-                img_data = utils.load_image(cam_snap)
-                render_image_processing_view(img_data, selected_filter, params, comp_view, max_dim)
-            except Exception as e:
-                st.error(f"Error capturing snapshot: {e}")
-
-    # 4. TAB: TRY DEMO PHOTOS
-    with tab_presets:
-        st.markdown("#### 🌟 Instant One-Click Demo Photos")
-        presets = get_available_presets()
-        if presets:
-            col_p1, col_p2 = st.columns([2, 1])
-            with col_p1:
-                selected_preset = st.selectbox("Select Demo Picture:", list(presets.keys()))
-            try:
-                img_data = utils.load_image(presets[selected_preset])
-                render_image_processing_view(img_data, selected_filter, params, comp_view, max_dim)
-            except Exception as e:
-                st.error(f"Error loading demo image: {e}")
-        else:
-            st.info("Presets directory empty.")
-
-
-def render_image_processing_view(input_image: np.ndarray, selected_filter: str, params: dict, comp_view: str, max_dim: int):
-    """Processes image and displays side-by-side comparison, metrics, and download button."""
-    orig_h, orig_w = input_image.shape[:2]
-    processed_input = utils.resize_image_max_dim(input_image, max_dim=max_dim)
-    cur_h, cur_w = processed_input.shape[:2]
-
-    # Process image
-    processed_result, duration_ms, fps = process_image(processed_input, selected_filter, params)
-
-    # Metric Cards
-    m1, m2, m3, m4 = st.columns(4)
-    with m1:
-        st.markdown(
-            f"""
-            <div class="metric-card">
-                <div class="metric-val">{selected_filter}</div>
-                <div class="metric-lbl">Active Filter</div>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-    with m2:
-        st.markdown(
-            f"""
-            <div class="metric-card">
-                <div class="metric-val">{duration_ms:.1f} ms</div>
-                <div class="metric-lbl">Processing Speed</div>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-    with m3:
-        st.markdown(
-            f"""
-            <div class="metric-card">
-                <div class="metric-val">{fps:.0f} FPS</div>
-                <div class="metric-lbl">Throughput</div>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-    with m4:
-        st.markdown(
-            f"""
-            <div class="metric-card">
-                <div class="metric-val">{cur_w} × {cur_h}</div>
-                <div class="metric-lbl">Resolution</div>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-
-    st.markdown("<br>", unsafe_allow_html=True)
-
-    is_rgba = (processed_result.ndim == 3 and processed_result.shape[2] == 4)
-
-    # Render Image View
-    if comp_view == "Side-by-Side (Original vs Filtered)":
-        c_orig, c_proc = st.columns(2)
-        with c_orig:
-            st.markdown("##### 📷 Original")
-            st.image(processed_input, channels="RGB", use_container_width=True)
-        with c_proc:
-            st.markdown(f"##### ✨ Result ({selected_filter})")
+        with col_right:
+            st.markdown(
+                f"""
+                <div class="panel-header">
+                    <span class="panel-label">Processed Image: {active_filter}</span>
+                    <span class="panel-status">[ACTIVE]</span>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+            st.markdown("<div class='image-frame'>", unsafe_allow_html=True)
             st.image(
                 processed_result,
                 channels="RGBA" if is_rgba else "RGB",
                 use_container_width=True,
             )
+            st.markdown("</div>", unsafe_allow_html=True)
 
-    elif comp_view == "Before / After Split (50/50)":
-        split_x = cur_w // 2
-        split_view = processed_input.copy()
-        if is_rgba:
-            fg = processed_result[:, split_x:, :3]
-            alpha = processed_result[:, split_x:, 3:4] / 255.0
-            bg = processed_input[:, split_x:]
-            split_view[:, split_x:] = (fg * alpha + bg * (1.0 - alpha)).astype(np.uint8)
-        else:
-            split_view[:, split_x:] = processed_result[:, split_x:]
+            # Real-time Metrics Dashboard
+            st.markdown(
+                f"""
+                <div class="metric-row">
+                    <div class="metric-box">
+                        <div class="metric-number">{latency_ms:.1f} ms</div>
+                        <div class="metric-title">Latency</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="metric-number">{fps:.0f}</div>
+                        <div class="metric-title">FPS</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="metric-number">{w}x{h}</div>
+                        <div class="metric-title">Resolution</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="metric-number">{'4 (RGBA)' if is_rgba else '3 (RGB)'}</div>
+                        <div class="metric-title">Channels</div>
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
 
-        cv2.line(split_view, (split_x, 0), (split_x, cur_h), (255, 255, 255), 3)
-        cv2.putText(split_view, "BEFORE", (25, 45), cv2.FONT_HERSHEY_DUPLEX, 1.0, (255, 255, 255), 2)
-        cv2.putText(split_view, "AFTER", (split_x + 25, 45), cv2.FONT_HERSHEY_DUPLEX, 1.0, (255, 255, 255), 2)
+            # Download Button
+            if is_rgba:
+                fmt, mime, ext = "PNG", "image/png", "png"
+            else:
+                fmt, mime, ext = "JPEG", "image/jpeg", "jpg"
 
-        st.markdown(f"##### 🔀 Before (Left) vs {selected_filter} (Right)")
-        st.image(split_view, channels="RGB", use_container_width=True)
+            export_bytes = utils.convert_to_download_bytes(processed_result, format=fmt)
+            filename = f"filtered_{active_filter.lower().replace(' ', '_')}.{ext}"
 
-    else:  # Filtered Only
-        st.markdown(f"##### ✨ Result ({selected_filter})")
-        st.image(
-            processed_result,
-            channels="RGBA" if is_rgba else "RGB",
-            use_container_width=True,
+            st.download_button(
+                label=f"Download Processed Image ({fmt} - {len(export_bytes) // 1024} KB)",
+                data=export_bytes,
+                file_name=filename,
+                mime=mime,
+                use_container_width=True,
+            )
+
+    # =========================================================================
+    # TAB 2: LIVE CAMERA STREAM (Browser WebRTC)
+    # =========================================================================
+    with tab_live_camera:
+        st.markdown(
+            f"""
+            <div class="panel-header" style="margin-bottom: 12px; border-radius: 8px;">
+                <span class="panel-label">Real-Time Browser Camera Stream</span>
+                <span class="panel-status">Active Filter: {active_filter}</span>
+            </div>
+            """,
+            unsafe_allow_html=True,
         )
 
-    # Big Friendly Download Button
-    st.markdown("<br>", unsafe_allow_html=True)
-    dcol1, dcol2 = st.columns([1, 2])
-    with dcol1:
-        if is_rgba:
-            fmt, mime, ext = "PNG", "image/png", "png"
+        st.markdown("Click **START** below and allow camera permissions in your browser. Video is processed frame-by-frame using the active filter.")
+
+        if HAS_WEBRTC:
+            webrtc_streamer(
+                key="studio-live-stream-streamer",
+                video_frame_callback=webrtc_video_frame_callback,
+                rtc_configuration=RTC_CONFIGURATION,
+                media_stream_constraints={"video": {"width": {"ideal": 640}, "height": {"ideal": 480}}, "audio": False},
+                async_processing=True,
+            )
         else:
-            fmt, mime, ext = "JPEG", "image/jpeg", "jpg"
-
-        file_bytes = utils.convert_to_download_bytes(processed_result, format=fmt)
-        clean_name = f"filter_{selected_filter.lower().replace(' ', '_')}.{ext}"
-
-        st.download_button(
-            label=f"⬇️ Download Photo ({fmt})",
-            data=file_bytes,
-            file_name=clean_name,
-            mime=mime,
-            use_container_width=True,
-        )
-    with dcol2:
-        st.caption(f"✅ Ready! High-resolution {fmt} export ({len(file_bytes) // 1024} KB).")
+            st.error("WebRTC streaming module is not available in the current environment.")
 
 
 if __name__ == "__main__":

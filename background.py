@@ -145,6 +145,50 @@ def get_foreground_mask_fast_fallback(
     return np.clip(mask_full, 0.0, 1.0)
 
 
+_MASK_CACHE = {}
+
+def get_cached_foreground_mask(
+    image: np.ndarray,
+    feather: int = 5,
+    threshold: float = 0.4,
+    use_ai: bool = True,
+) -> np.ndarray:
+    """
+    Caches the generated mask based on image fingerprint and parameters.
+    Prevents re-running neural network inference when user tweaks blur strength or background color.
+    """
+    global _MASK_CACHE
+    h, w = image.shape[:2]
+    # Fast lightweight sample tuple for cache key
+    key = (
+        int(image[0, 0, 0]),
+        int(image[h // 2, w // 2, 0]),
+        int(image[-1, -1, 0]),
+        h,
+        w,
+        feather,
+        round(float(threshold), 2),
+        use_ai,
+    )
+
+    if key in _MASK_CACHE:
+        return _MASK_CACHE[key]
+
+    if use_ai:
+        try:
+            mask = get_foreground_mask_ai(image, feather=feather, threshold=threshold)
+        except Exception:
+            mask = get_foreground_mask_fast_fallback(image, feather=feather)
+    else:
+        mask = get_foreground_mask_fast_fallback(image, feather=feather)
+
+    if len(_MASK_CACHE) > 6:
+        _MASK_CACHE.clear()
+
+    _MASK_CACHE[key] = mask
+    return mask
+
+
 def apply_background_blur(
     image: np.ndarray,
     blur_strength: int = 35,
@@ -154,29 +198,18 @@ def apply_background_blur(
 ) -> np.ndarray:
     """
     Blurs the background while preserving crisp foreground details.
-    
-    Process:
-    1. Generates foreground/background alpha mask
-    2. Blurs entire image according to blur_strength
-    3. Retains sharp foreground
-    4. Smoothly composites foreground over blurred background
+    Uses cached foreground mask for sub-millisecond slider response.
     """
     k = blur_strength if blur_strength % 2 != 0 else blur_strength + 1
     k = max(3, k)
 
-    # 1. Generate mask
-    if use_ai:
-        try:
-            mask = get_foreground_mask_ai(image, feather=feather, threshold=threshold)
-        except Exception:
-            mask = get_foreground_mask_fast_fallback(image, feather=feather)
-    else:
-        mask = get_foreground_mask_fast_fallback(image, feather=feather)
+    # 1. Get cached mask
+    mask = get_cached_foreground_mask(image, feather=feather, threshold=threshold, use_ai=use_ai)
 
     # 2. Blur the background
     blurred = cv2.GaussianBlur(image, (k, k), sigmaX=0)
 
-    # 3 & 4. Alpha composite: result = foreground * mask + background * (1 - mask)
+    # 3 & 4. Alpha composite
     alpha = mask[:, :, np.newaxis]
     composite = (image.astype(np.float32) * alpha) + (blurred.astype(np.float32) * (1.0 - alpha))
     return np.clip(composite, 0, 255).astype(np.uint8)
@@ -192,19 +225,11 @@ def apply_background_removal(
 ) -> np.ndarray:
     """
     Removes the background from the image.
-    If background_type is "Transparent (PNG)", returns an RGBA image with transparent background.
-    Otherwise returns an RGB image composited onto the requested background color.
+    Uses cached foreground mask for sub-millisecond slider response.
     """
-    if use_ai:
-        try:
-            mask = get_foreground_mask_ai(image, feather=feather, threshold=threshold)
-        except Exception:
-            mask = get_foreground_mask_fast_fallback(image, feather=feather)
-    else:
-        mask = get_foreground_mask_fast_fallback(image, feather=feather)
+    mask = get_cached_foreground_mask(image, feather=feather, threshold=threshold, use_ai=use_ai)
 
     if background_type == "Transparent (PNG)":
-        # Create 4-channel RGBA array
         alpha_channel = (mask * 255.0).astype(np.uint8)
         rgba = np.dstack((image, alpha_channel))
         return rgba
