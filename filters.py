@@ -247,14 +247,26 @@ def apply_document_scanner(
     contrast: float = 1.25,
     brightness: int = 15,
     mode: Literal["Color Document", "Black and White Scan"] = "Color Document",
+    auto_flatten: bool = False,
 ) -> np.ndarray:
     """
     Cleans written pages, whiteboards, notes, and documents in real time:
     - Removes shadows, yellowish tints, creases, and uneven ambient lighting
     - Makes the paper background crystal-clear pure white (255, 255, 255)
     - Keeps ink (handwriting, pen strokes, print) sharp and legible
+    - Optional 4-point perspective warp to straighten angled pages
     """
-    gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
+    work_img = image
+    if auto_flatten:
+        try:
+            import ocr
+            flattened, ok = ocr.auto_perspective_flatten(work_img)
+            if ok:
+                work_img = flattened
+        except Exception:
+            pass
+
+    gray = cv2.cvtColor(work_img, cv2.COLOR_RGB2GRAY)
     
     # Estimate background illumination surface
     dilated = cv2.dilate(gray, np.ones((7, 7), np.uint8))
@@ -268,7 +280,7 @@ def apply_document_scanner(
 
     # Color Document mode: normalize RGB channels by estimated luminance background
     bg_f = np.maximum(bg.astype(np.float32), 1.0)
-    norm = (image.astype(np.float32) / bg_f[:, :, None]) * 255.0
+    norm = (work_img.astype(np.float32) / bg_f[:, :, None]) * 255.0
     stretched = np.clip(norm * float(contrast) + int(brightness), 0, 255).astype(np.uint8)
     return stretched
 

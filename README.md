@@ -30,8 +30,14 @@ The system is optimized for speed on consumer laptops, leveraging vectorized Num
   - Webcam snapshot capture using native browser camera integration
   - Live real-time webcam video stream loop via WebRTC with live FPS tracking
   - Built-in preset sample images (Portrait and Landscape) for instant testing
-- 18 High-Performance Computer Vision Filters:
+- 19 High-Performance Computer Vision Filters:
+  - Document Scanner (Page Whitening, Shadow Normalization, and Auto-Flatten 4-Point Perspective Crop)
   - Classic spatial filters, edge operators, color adjustments, artistic effects, and AI segmentation
+- CamScanner OCR & Digital Text Extraction:
+  - Extracts text from paper documents, whiteboards, notes, and handwriting
+  - Interactive digital text workspace to correct handwriting (e.g. fixing letters like 'C', symbols, or notes)
+  - Word & character region bounding boxes overlay directly on the processed document
+  - 1-click download of extracted text as a `.txt` file
 - Interactive Dynamic Parameters:
   - Real-time sliders for kernel sizes, sigma, thresholds, brightness, contrast, saturation, and feathering
 - Side-by-Side Real-Time Comparison:
@@ -48,6 +54,7 @@ The system is optimized for speed on consumer laptops, leveraging vectorized Num
   - Image resolution indicator with automated high-resolution downscaling
 - Clean Export:
   - Download processed images (PNG with alpha transparency for cutouts, high-quality JPEG for standard filters)
+  - Download clean extracted document text (.txt)
 
 ---
 

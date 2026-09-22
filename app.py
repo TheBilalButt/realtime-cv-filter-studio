@@ -24,6 +24,7 @@ except ImportError:
 import filters
 import background
 import utils
+import ocr
 
 # --- Thread-Safe Holder for Live WebRTC Processing ---
 class LiveFilterHolder:
@@ -348,6 +349,7 @@ def apply_filter_pipeline(image_rgb: np.ndarray, filter_name: str, params: dict)
             contrast=params.get("contrast", 1.25),
             brightness=params.get("brightness", 15),
             mode=params.get("mode", "Color Document"),
+            auto_flatten=params.get("auto_flatten", False),
         )
     elif filter_name == "Grayscale":
         processed = filters.apply_grayscale(image_rgb)
@@ -561,13 +563,15 @@ def render_parameter_controls(active_filter: str) -> dict:
     st.markdown(f"<div style='font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #38bdf8; margin-bottom: 6px;'>Parameters: {active_filter}</div>", unsafe_allow_html=True)
 
     if active_filter == "Document Scanner":
-        c1, c2, c3 = st.columns(3)
+        c1, c2, c3, c4 = st.columns(4)
         with c1:
             params["mode"] = st.selectbox("Scan Mode", ["Color Document", "Black and White Scan"])
         with c2:
             params["contrast"] = st.slider("Text & Ink Contrast", 0.8, 2.5, 1.25, step=0.05)
         with c3:
             params["brightness"] = st.slider("Paper Whitener Boost", 0, 50, 15, step=5)
+        with c4:
+            params["auto_flatten"] = st.checkbox("Auto-Flatten (Perspective)", value=False)
 
     elif active_filter == "Cartoon Effect":
         c1, c2, c3 = st.columns(3)
@@ -845,9 +849,15 @@ def main():
                 """,
                 unsafe_allow_html=True,
             )
+            display_processed = processed_result
+            if st.session_state.get("show_ocr_boxes", False) and "last_ocr_result" in st.session_state:
+                boxes = st.session_state["last_ocr_result"].get("word_boxes", [])
+                if boxes:
+                    display_processed = ocr.draw_bounding_boxes(processed_result, boxes)
+
             st.markdown("<div class='image-frame'>", unsafe_allow_html=True)
             st.image(
-                processed_result,
+                display_processed,
                 channels="RGBA" if is_rgba else "RGB",
                 use_container_width=True,
             )
@@ -894,6 +904,69 @@ def main():
                 mime=mime,
                 use_container_width=True,
             )
+
+        # CamScanner OCR & Document Text Correction Studio
+        with st.expander("CamScanner OCR: Extract Document to Digital Text & Correct Handwriting", expanded=(active_filter == "Document Scanner")):
+            st.markdown(
+                """
+                <div style="font-size: 0.82rem; color: #94a3b8; margin-bottom: 8px;">
+                    CamScanner text recognition engine detects printed or handwritten characters on your document,
+                    identifies word boundaries, and extracts digital text so you can correct letters, edit notes, and export clean text.
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+            ocr_col1, ocr_col2 = st.columns([1, 1])
+            with ocr_col1:
+                do_extract = st.button("Extract Document Text", key="btn_run_ocr", use_container_width=True)
+            with ocr_col2:
+                show_boxes = st.checkbox(
+                    "Highlight Recognized Word Regions (Bounding Boxes)",
+                    value=st.session_state.get("show_ocr_boxes", False),
+                    key="chk_ocr_boxes",
+                )
+                if show_boxes != st.session_state.get("show_ocr_boxes", False):
+                    st.session_state["show_ocr_boxes"] = show_boxes
+                    st.rerun()
+
+            if do_extract or "last_ocr_result" in st.session_state:
+                if do_extract:
+                    with st.spinner("Analyzing document and extracting text..."):
+                        st.session_state["last_ocr_result"] = ocr.extract_document_text(processed_result)
+
+                ocr_res = st.session_state.get("last_ocr_result", {})
+                if ocr_res and ocr_res.get("success"):
+                    st.markdown(
+                        f"""
+                        <div style="display: flex; gap: 8px; align-items: center; margin: 8px 0; flex-wrap: wrap;">
+                            <span class="panel-status">Engine: {ocr_res.get('engine', 'OCR')}</span>
+                            <span class="panel-status" style="background: rgba(16, 185, 129, 0.12); color: #34d399; border-color: rgba(16, 185, 129, 0.25);">{ocr_res.get('line_count', 0)} Lines Detected</span>
+                            <span class="panel-status" style="background: rgba(168, 85, 247, 0.12); color: #c084fc; border-color: rgba(168, 85, 247, 0.25);">{ocr_res.get('word_count', 0)} Words / Glyphs</span>
+                        </div>
+                        """,
+                        unsafe_allow_html=True,
+                    )
+
+                    edited_text = st.text_area(
+                        "Digital Document Text (Edit and correct characters here):",
+                        value=ocr_res.get("text", ""),
+                        height=160,
+                        help="You can correct any recognized characters, fix handwritten letters like 'C', or format notes.",
+                        key="doc_ocr_text_area",
+                    )
+
+                    t_down_col1, t_down_col2 = st.columns(2)
+                    with t_down_col1:
+                        st.download_button(
+                            label="Download Clean Digital Text (.txt)",
+                            data=edited_text.encode("utf-8"),
+                            file_name="scanned_document_text.txt",
+                            mime="text/plain",
+                            use_container_width=True,
+                        )
+                    with t_down_col2:
+                        st.caption("Extracted text is ready for copying, editing, or saving.")
 
         # Source Selection Drawer (Upload / Presets / Snapshot)
         with st.expander("Change Image / Upload Custom Photo", expanded=False):
